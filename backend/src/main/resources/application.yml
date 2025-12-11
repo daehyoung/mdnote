@@ -21,3 +21,10 @@ spring:
 
 file:
   upload-dir: /app/uploads
+
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
