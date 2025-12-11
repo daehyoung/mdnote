@@ -1,9 +1,7 @@
 package kr.luxsoft.mdnote.controller;
 
 import kr.luxsoft.mdnote.model.Attachment;
-import kr.luxsoft.mdnote.model.Document;
-import kr.luxsoft.mdnote.model.Tag;
-import kr.luxsoft.mdnote.repository.AttachmentRepository;
+import kr.luxsoft.mdnote.model.Document;  
 import kr.luxsoft.mdnote.repository.DocumentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,8 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.hamcrest.Matchers.*;
+ 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -33,9 +30,6 @@ public class DocumentIntegrationTest {
 
     @Autowired
     private DocumentRepository documentRepository;
-
-    @Autowired
-    private AttachmentRepository attachmentRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
