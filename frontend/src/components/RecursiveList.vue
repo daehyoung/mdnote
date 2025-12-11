@@ -5,6 +5,9 @@
         v-bind="props"
         prepend-icon="mdi-folder-open-outline"
         :title="item.name"
+        @click="onSelect(item)"
+        :active="selectedId === item.id"
+        color="primary"
       ></v-list-item>
     </template>
 

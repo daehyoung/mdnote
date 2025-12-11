@@ -1,0 +1,88 @@
+
+> md-note-frontend@0.0.0 test:e2e:headless
+> cypress run --spec cypress/e2e/ownership.cy.js
+
+
+DevTools listening on ws://127.0.0.1:57806/devtools/browser/df4456e2-58f7-4d9d-82c5-6750c6cffac2
+
+==================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        15.7.1                                                                         │
+  │ Browser:        Electron 138 (headless)                                                        │
+  │ Node Version:   v20.13.1 (/Users/daehyoung/.nvm/versions/node/v20.13.1/bin/node)               │
+  │ Specs:          1 found (ownership.cy.js)                                                      │
+  │ Searched:       cypress/e2e/ownership.cy.js                                                    │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  ownership.cy.js                                                                 (1 of 1)
+
+
+  Document Ownership
+    1) User can edit own document
+    2) Non-owner cannot delete Admin document
+    3) Admin can delete User document
+
+
+  0 passing (15s)
+  3 failing
+
+  1) Document Ownership
+       User can edit own document:
+     AssertionError: Timed out retrying after 4000ms: Expected to find content: 'New Document' but never did.
+      at Context.eval (webpack://md-note-frontend/./cypress/e2e/ownership.cy.js:34:11)
+
+  2) Document Ownership
+       Non-owner cannot delete Admin document:
+     AssertionError: Timed out retrying after 4000ms: Expected to find content: 'New Document' but never did.
+      at Context.eval (webpack://md-note-frontend/./cypress/e2e/ownership.cy.js:49:11)
+
+  3) Document Ownership
+       Admin can delete User document:
+     AssertionError: Timed out retrying after 4000ms: Expected to find content: 'New Document' but never did.
+      at Context.eval (webpack://md-note-frontend/./cypress/e2e/ownership.cy.js:94:11)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        3                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      3                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  3                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     14 seconds                                                                       │
+  │ Spec Ran:     ownership.cy.js                                                                  │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  /Users/daehyoung/ws/md-note/frontend/cypress/screenshots/ownership.cy.js/Documen    (2560x1440)
+     t Ownership -- User can edit own document (failed).png                                         
+  -  /Users/daehyoung/ws/md-note/frontend/cypress/screenshots/ownership.cy.js/Documen    (2560x1440)
+     t Ownership -- Non-owner cannot delete Admin document (failed).png                             
+  -  /Users/daehyoung/ws/md-note/frontend/cypress/screenshots/ownership.cy.js/Documen    (2560x1440)
+     t Ownership -- Admin can delete User document (failed).png                                     
+
+
+==================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ✖  ownership.cy.js                          00:14        3        -        3        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ✖  1 of 1 failed (100%)                     00:14        3        -        3        -        -  
+

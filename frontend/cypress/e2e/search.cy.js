@@ -5,6 +5,8 @@ describe('Search Functionality', () => {
     cy.get('input[name=username]').type('admin');
     cy.get('input[name=password]').type('admin');
     cy.get('button').contains('Login').click();
+    cy.url().should('not.include', '/login');
+    cy.contains('Documents').should('be.visible');
   });
 
   it('should filter documents by search query', () => {
@@ -13,7 +15,7 @@ describe('Search Functionality', () => {
     const uniqueTitle = 'Searchable Doc ' + Date.now();
     
     // Create doc
-    cy.get('button[value="EDIT"]').click({ force: true });
+    cy.contains('button', 'Edit').click({ force: true });
     cy.contains('New Document').click();
     cy.get('#title-input').clear().type(uniqueTitle);
     cy.contains('Save').click();
@@ -22,9 +24,10 @@ describe('Search Functionality', () => {
     // cy.reload() keeps us on the document page now that we have bookmarkable URLs.
     // We must go to root to see the list and search bar
     cy.visit('/');
+    cy.contains('Documents').should('be.visible');
     
-    // Type in search bar
-    cy.get('#search-input').type(uniqueTitle);
+    // Type in search bar and hit Enter
+    cy.get('#search-input').type(uniqueTitle + '{enter}');
     
     // Verify list contains only the doc (or at least contains it)
     cy.contains(uniqueTitle).should('be.visible');

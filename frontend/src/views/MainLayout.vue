@@ -1,6 +1,6 @@
 <template>
   <v-layout class="rounded rounded-md">
-    <v-app-bar color="primary" dark>
+    <v-app-bar :elevation="2">
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>MD Note</v-toolbar-title>
       
@@ -20,12 +20,12 @@
           </v-btn>
       </v-btn-toggle>
       
-      <v-btn icon to="/admin" title="Admin Dashboard">
-          <v-icon>mdi-shield-account</v-icon>
+      <v-btn v-if="authStore.isAdmin" icon :to="isAdminRoute ? '/' : '/admin'" :title="isAdminRoute ? 'Back to App' : 'Admin Dashboard'">
+          <v-icon>{{ isAdminRoute ? 'mdi-home' : 'mdi-shield-account' }}</v-icon>
       </v-btn>
   
-      <v-btn icon to="/profile" title="My Profile">
-          <v-icon>mdi-account</v-icon>
+      <v-btn icon :to="isProfileRoute ? '/' : '/profile'" :title="isProfileRoute ? 'Back to App' : 'My Profile'" data-test="profile-button">
+          <v-icon>{{ isProfileRoute ? 'mdi-home' : 'mdi-account' }}</v-icon>
       </v-btn>
   
       <v-btn icon @click="logout" title="Logout">
@@ -33,7 +33,7 @@
       </v-btn>
     </v-app-bar>
   
-    <v-navigation-drawer v-model="drawer" width="300">
+    <v-navigation-drawer v-model="drawer" width="300" v-if="!isAdminRoute">
       <div class="pa-2">
       </div>
       <v-divider></v-divider>
@@ -66,13 +66,23 @@
 import { ref, onMounted } from 'vue';
 import { useAuthStore } from '../stores/auth';
 import { useDocumentStore } from '../stores/document';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import RecursiveList from '../components/RecursiveList.vue';
+import { computed } from 'vue';
 
 const drawer = ref(true);
 const authStore = useAuthStore();
 const documentStore = useDocumentStore();
 const router = useRouter();
+const route = useRoute();
+
+const isAdminRoute = computed(() => {
+    return route.path.startsWith('/admin');
+});
+
+const isProfileRoute = computed(() => {
+    return route.path.startsWith('/profile');
+});
 
 // Sync with store state
 const appMode = ref(documentStore.appMode);
@@ -91,13 +101,18 @@ const filterByCategory = async (category) => {
     const catId = category ? category.id : null;
     documentStore.setSelectedCategoryId(catId);
     documentStore.currentDocument = null; // Clear view to show list
+    router.push({ name: 'home' });
     await documentStore.fetchDocuments(catId);
 };
 
 
 
-onMounted(() => {
+onMounted(async () => {
     // Initial fetch of categories for the sidebar
     documentStore.fetchCategories();
+    // Ensure profile is loaded for UI logic (like Admin toggle)
+    if (authStore.isAuthenticated && !authStore.user) {
+        await authStore.fetchProfile();
+    }
 });
 </script>

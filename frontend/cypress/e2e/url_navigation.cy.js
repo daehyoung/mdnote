@@ -14,7 +14,7 @@ describe('URL Navigation and Deep Linking', () => {
       cy.visit('/');
 
       // 1.1 Toggle to EDIT mode
-      cy.get('button[value="EDIT"]').click();
+      cy.contains('button', 'Edit').click({ force: true });
       
       // 2. Create a document to ensure list is not empty (optional, but good for isolation)
       // Or just click first item if exists

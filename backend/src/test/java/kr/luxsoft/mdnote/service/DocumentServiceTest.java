@@ -19,6 +19,9 @@ public class DocumentServiceTest {
     @Mock
     private DocumentRepository documentRepository;
 
+    @Mock
+    private kr.luxsoft.mdnote.repository.UserRepository userRepository;
+
     @InjectMocks
     private DocumentService documentService;
 
@@ -27,10 +30,14 @@ public class DocumentServiceTest {
         Document doc = new Document();
         doc.setTitle("Test Doc");
         doc.setContent("Content");
+        
+        kr.luxsoft.mdnote.model.User user = new kr.luxsoft.mdnote.model.User();
+        user.setUsername("testuser");
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
 
         when(documentRepository.save(any(Document.class))).thenReturn(doc);
 
-        Document created = documentService.createDocument(doc);
+        Document created = documentService.createDocument(doc, "testuser");
 
         assertEquals("Test Doc", created.getTitle());
         verify(documentRepository).save(doc);

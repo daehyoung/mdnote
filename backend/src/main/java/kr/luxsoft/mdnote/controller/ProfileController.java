@@ -42,6 +42,7 @@ public class ProfileController {
                 .map(user -> {
                     if (payload.containsKey("name")) user.setName(payload.get("name"));
                     if (payload.containsKey("email")) user.setEmail(payload.get("email"));
+                    if (payload.containsKey("theme")) user.setTheme(payload.get("theme"));
                     return ResponseEntity.ok(userRepository.save(user));
                 })
                 .orElse(ResponseEntity.notFound().build());

@@ -24,4 +24,20 @@ public class UserService {
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+    
+    public User updateUser(Long id, User updatedInfo) {
+        return userRepository.findById(id).map(user -> {
+            if (updatedInfo.getName() != null) user.setName(updatedInfo.getName());
+            if (updatedInfo.getRole() != null) user.setRole(updatedInfo.getRole());
+            if (updatedInfo.getStatus() != null) user.setStatus(updatedInfo.getStatus());
+            return userRepository.save(user);
+        }).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public void resetPassword(Long id, String newPassword) {
+        userRepository.findById(id).map(user -> {
+            user.setPasswordHash(passwordEncoder.encode(newPassword));
+            return userRepository.save(user);
+        }).orElseThrow(() -> new RuntimeException("User not found"));
+    }
 }

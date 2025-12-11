@@ -1,0 +1,72 @@
+
+> md-note-frontend@0.0.0 test:e2e:headless
+> cypress run --spec cypress/e2e/search.cy.js
+
+
+DevTools listening on ws://127.0.0.1:55526/devtools/browser/0faf9b59-474f-41d7-bba6-a63f5b4305f2
+
+==================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        15.7.1                                                                         │
+  │ Browser:        Electron 138 (headless)                                                        │
+  │ Node Version:   v20.13.1 (/Users/daehyoung/.nvm/versions/node/v20.13.1/bin/node)               │
+  │ Specs:          1 found (search.cy.js)                                                         │
+  │ Searched:       cypress/e2e/search.cy.js                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  search.cy.js                                                                    (1 of 1)
+
+
+  Search Functionality
+    1) should filter documents by search query
+
+
+  0 passing (6s)
+  1 failing
+
+  1) Search Functionality
+       should filter documents by search query:
+     AssertionError: Timed out retrying after 4000ms: Expected to find element: `#search-input`, but never found it.
+      at Context.eval (webpack://md-note-frontend/./cypress/e2e/search.cy.js:27:7)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     5 seconds                                                                        │
+  │ Spec Ran:     search.cy.js                                                                     │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  /Users/daehyoung/ws/md-note/frontend/cypress/screenshots/search.cy.js/Search Fun    (2560x1440)
+     ctionality -- should filter documents by search query (failed).png                             
+
+
+==================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ✖  search.cy.js                             00:05        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ✖  1 of 1 failed (100%)                     00:05        1        -        1        -        -  
+

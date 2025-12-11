@@ -19,7 +19,8 @@ describe('API Verification & Cleanup', () => {
             headers: { Authorization: `Bearer ${token}` }
         }).then((response) => {
             expect(response.status).to.eq(200);
-            const docs = response.body;
+            // Handle Pagination
+            const docs = response.body.content || response.body;
             // Filter "Untitled" or "Cypress Test Doc"
             const trash = docs.filter(d => d.title === 'Untitled' || d.title.startsWith('Cypress Test Doc'));
             
@@ -128,7 +129,9 @@ describe('API Verification & Cleanup', () => {
             headers: { Authorization: `Bearer ${token}` }
         }).then((response) => {
             expect(response.status).to.eq(200);
-            const found = response.body.find(d => d.title === 'Title Only Update'); 
+            // Handle Pagination
+            const docs = response.body.content || response.body;
+            const found = docs.find(d => d.title === 'Title Only Update'); 
             // Note: Title persists from 3a. Content from 3b.
             expect(found, 'Document should exist').to.exist;
         });

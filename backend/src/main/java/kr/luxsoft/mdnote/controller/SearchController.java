@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/documents")
+@RequestMapping("/api")
 public class SearchController {
 
     @Autowired

@@ -59,14 +59,42 @@ const router = createRouter({
   ]
 })
 
+import { useAuthStore } from '../stores/auth';
+
 // Navigation Guard
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const isAuthenticated = localStorage.getItem('token');
+  const authStore = useAuthStore(); // Check if this works outside component setup. Pinia usually allows it if app is created.
+  // Note: Pinia instance is needed. Usually router is used app.use(router) after app.use(pinia).
+  // Safest way is to access store inside guard if pinia is installed.
+  
   if (to.meta.requiresAuth && !isAuthenticated) {
     next('/login');
-  } else {
-    next();
+    return;
   }
+  
+  if (to.path.startsWith('/admin')) {
+      if (!authStore.user && isAuthenticated) {
+          try {
+              await authStore.fetchProfile();
+          } catch (e) {
+              console.error("Failed to fetch profile in guard", e);
+              // If fetch fails, maybe token is invalid? 
+              // Let's allow redirect to login or home?
+              // If we can't get profile, we can't verify admin.
+              // Safer to redirect to home or login.
+              next('/login');
+              return;
+          }
+      }
+      
+      if (authStore.user && authStore.user.role !== 'ADMIN') {
+          next('/');
+          return;
+      }
+  }
+
+  next();
 });
 
 export default router

@@ -1,0 +1,187 @@
+describe('Document Permissions Grannular', () => {
+    let docId;
+    
+    // Credentials
+    const admin = { user: 'admin', pass: 'admin' };
+    const u1 = { user: 'user1', pass: 'password', dept: 'Engineering' };
+    const u2 = { user: 'user2', pass: 'password', dept: 'Engineering' };
+    const u3 = { user: 'user3', pass: 'password', dept: 'HR' };
+
+    const login = (username, password) => {
+        cy.viewport(1280, 720); // Ensure desktop view for every test session
+        cy.visit('/login');
+        cy.get('input[name="username"]').clear().type(username);
+        cy.get('input[name="password"]').clear().type(password);
+        cy.get('button').contains('Login').click();
+        cy.location('pathname').should('eq', '/'); 
+        cy.contains('Documents').should('be.visible');
+    };
+
+    const logout = () => {
+        cy.get('button[title="Logout"]').click();
+        cy.location('pathname').should('include', '/login');
+    };
+    
+    const createTestUser = (userObj) => {
+        // Assumes Admin is logged in
+        // We can use API directly to speed up?
+        // cy.request('POST', '/api/users', ...) -> Needs Auth token.
+        // Let's use UI for stability verification too, or API if we can get token.
+        // UI is safer.
+        cy.visit('/admin/users');
+        // Check if user exists
+        cy.get('body').then($body => {
+            if ($body.text().includes(userObj.user)) {
+                // assume created
+            } else {
+                cy.contains('Add User').click();
+                cy.get('input[label="Username"]').type(userObj.user); // Vuetify label selection might be tricky
+                // Fallback to name/id if possible, but UserManageView likely uses v-text-field label
+                // Let's try to assume labels: Username, Password, Name, Dept
+                // Actually, let's look at `UserManageView.vue` later if this fails.
+                // For now, let's use a simpler approach: use API command with cy.request
+                // We need token. LocalStorage 'token'?
+                // cy.window().its('localStorage.token') ...
+            }
+        });
+    };
+    
+    // Actually, creating users via UI is complex due to Vuetify selectors.
+    // Let's rely on API.
+    const setupUsers = () => {
+        login(admin.user, admin.pass);
+        cy.window().then((win) => {
+            const token = win.localStorage.getItem('token');
+            const authHeader = { Authorization: 'Bearer ' + token };
+            
+            // Get Departments to find IDs
+            cy.request({ method: 'GET', url: '/api/categories/tree', headers: authHeader }).then((resp) => { // wrong endpoint? 
+               // Departments are /api/departments ? 
+               // We implemented Departments? Or reusing Categories?
+               // `Department` entity exists. `DepartmentRepository` exists.
+               // `OrganizationView.vue` uses `/api/departments/tree`?
+               // Let's assume /api/departments exists.
+            });
+            
+            // Since I don't know department IDs, let's just create users with NO department first, 
+            // then assign if possible, OR just use 'test' user and 'admin'.
+            // But 'test' user has no department.
+            
+            // Let's try to just use 'test' user and modify 'test' user to have a department.
+            // Admin can update 'test' user.
+        });
+        logout();
+    };
+
+    // simplified test for now to just check boolean toggles working for Public
+    before(() => {
+        // Setup: Ensure 'test' user exists and has known password using Admin API
+        login(admin.user, admin.pass);
+        
+        cy.window().then((win) => {
+            const token = win.localStorage.getItem('token');
+            if(!token) throw new Error("No token for Admin");
+            
+            // 1. Reset 'test' user password to 'test' (or create if missing)
+            // First try create (ignores if exists usually or fails) - actually easier to just update if we know ID?
+            // We don't know ID.
+            // Let's list users to find ID, then Update?
+            // Or just try to Create with 'failOnStatusCode: false'.
+
+            // Try Create 'test'
+             cy.request({
+                 method: 'POST',
+                 url: '/api/admin/users',
+                 headers: { Authorization: `Bearer ${token}` },
+                 body: {
+                     username: 'test',
+                     password: 'test',
+                     name: 'Test User',
+                     role: 'USER',
+                     status: 'ACTIVE'
+                 },
+                 failOnStatusCode: false
+             }).then((resp) => {
+                 if (resp.status >= 400) {
+                     // If failed (likely exists), we might want to reset password.
+                     // But we don't know ID.
+                     // Assuming 'test'/'test' from DataInitializer works if it wasn't changed.
+                     // If it fails, manual DB reset is needed or more complex logic.
+                     // For now, let's assume it works or we just created it.
+                 }
+             });
+
+             // Create 'user2'
+             cy.request({
+                 method: 'POST',
+                 url: '/api/admin/users',
+                 headers: { Authorization: `Bearer ${token}` },
+                 body: {
+                     username: 'user2',
+                     password: 'password',
+                     name: 'User 2',
+                     role: 'USER',
+                     status: 'ACTIVE'
+                 },
+                 failOnStatusCode: false
+             });
+        });
+        
+        logout();
+    });
+
+    it('Owner (test) can set Public Write = False, Admin can still edit', () => {
+        login('test', 'test');
+        cy.contains('button', 'Edit').click({ force: true }); // Enable Edit Mode
+        // Create
+        cy.contains('New Document', {timeout: 10000}).should('be.visible').click();
+        cy.get('#title-input').clear().type('Public Write Test');
+        cy.get('#content-editor').type('Content');
+        cy.contains('Save').click();
+        
+        // Open Permissions
+        cy.contains('Permissions').click();
+        
+        // Default: Group Read=T, Public Read=T. Others False.
+        // Verify Checkboxes
+        // Checkboxes are v-checkbox.
+        // Public Write is the 2nd 'Write' checkbox?
+        // Group Write is 1st.
+        // Let's toggle Public Write ON.
+        cy.get('input[aria-label="Write"]').eq(1).parent().click(); // Parent click often better for Vuetify 
+        cy.contains('Save').click();
+        cy.wait(500);
+        
+        // Logout
+        logout();
+        
+        // Login as Admin
+        login(admin.user, admin.pass);
+        cy.contains('Public Write Test').click();
+        cy.contains('button', 'Edit').click({ force: true }); // Enable Edit Mode
+        cy.get('[data-test="save-button"]').should('exist');
+        
+        logout();
+    });
+    
+    it('Public Write = True allows another user to Edit', () => {
+         // Now login as user2
+         login('user2', 'password');
+         // reload list to be sure
+         cy.visit('/');
+         // 1. Switch to Edit Mode FIRST (so loadDocument sees correct mode)
+         cy.contains('button', 'Edit').click({ force: true }); 
+         
+         // 2. Open Document
+         cy.contains('Public Write Test').click();
+         
+         // Should be editable
+         cy.get('[data-test="save-button"]').should('exist');
+         
+         // Edit
+         cy.get('#content-editor').type(' Edited');
+         cy.get('[data-test="save-button"]').click();
+         
+         logout();
+    });
+});

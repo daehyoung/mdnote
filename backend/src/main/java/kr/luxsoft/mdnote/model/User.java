@@ -29,6 +29,9 @@ public class User {
     private String role; 
     private String status;
 
+    @Column
+    private String theme = "light"; // Default to light
+
     @ManyToOne
     @JoinColumn(name = "dept_id")
     private Department department;
@@ -39,5 +42,10 @@ public class User {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+    }
+
+    // JSON compatibility for "password" field
+    public void setPassword(String password) {
+        this.passwordHash = password;
     }
 }

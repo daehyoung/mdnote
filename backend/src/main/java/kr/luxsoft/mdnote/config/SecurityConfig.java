@@ -21,10 +21,12 @@ public class SecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/auth/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/admin/**")).hasRole("ADMIN")
                  // Allow H2 console if we use H2, but we use Postgres. 
                  // Allow all for now during dev to facilitate testing
                 .anyRequest().permitAll() 
-            );
+            )
+            .addFilterBefore(new kr.luxsoft.mdnote.security.DevAuthFilter(), org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

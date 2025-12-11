@@ -20,6 +20,9 @@ public class AdminController {
     @Autowired
     private kr.luxsoft.mdnote.repository.DepartmentRepository departmentRepository;
 
+    @Autowired
+    private kr.luxsoft.mdnote.service.UserService userService;
+
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userRepository.findAll());
@@ -48,5 +51,31 @@ public class AdminController {
                     return ResponseEntity.ok(userRepository.save(user));
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+    @PostMapping("/users")
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        System.out.println("AdminController: Creating user " + user.getUsername());
+        // Default values
+        if (user.getStatus() == null) user.setStatus("ACTIVE");
+        if (user.getRole() == null) user.setRole("USER");
+        // Hash password (assuming provided raw in passwordHash for creation)
+        return ResponseEntity.ok(userService.registerUser(user));
+    }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userRepository.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+        return ResponseEntity.ok(userService.updateUser(id, user));
+    }
+
+    @PutMapping("/users/{id}/password")
+    public ResponseEntity<?> resetPassword(@PathVariable Long id, @RequestBody String newPassword) {
+        userService.resetPassword(id, newPassword);
+        return ResponseEntity.ok().build();
     }
 }

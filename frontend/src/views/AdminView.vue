@@ -29,14 +29,7 @@
             ></v-list-item>
         </v-list>
 
-        <template v-slot:append>
-             <div class="pa-2">
-                <v-btn block color="secondary" to="/">
-                    <v-icon start>mdi-arrow-left</v-icon>
-                    Back to App
-                </v-btn>
-             </div>
-        </template>
+
     </v-navigation-drawer>
 
     <!-- Main Admin Content -->

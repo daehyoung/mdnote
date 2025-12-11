@@ -23,27 +23,24 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import api from '../services/api';
+import { useDocumentStore } from '../stores/document';
 
 const route = useRoute();
 const router = useRouter();
+const documentStore = useDocumentStore();
+
 const query = ref('');
-const results = ref([]);
-const loading = ref(false);
+const results = computed(() => documentStore.documents);
+const loading = computed(() => documentStore.loading);
 
 const performSearch = async (q) => {
-    if (!q) return;
-    loading.value = true;
-    try {
-        const response = await api.get(`/documents/search?q=${encodeURIComponent(q)}`);
-        results.value = response.data;
-    } catch (e) {
-        console.error("Search failed", e);
-    } finally {
-        loading.value = false;
+    if (!q) {
+        documentStore.documents = []; // Clear results
+        return;
     }
+    await documentStore.searchDocuments(q);
 };
 
 const getSnippet = (content) => {
@@ -52,17 +49,7 @@ const getSnippet = (content) => {
 };
 
 const openDocument = (id) => {
-    // Navigate home and select doc? Or just assume Home with query param?
-    // For now, let's go Home but maybe we need logic to open specific doc
-    // We can pass query param to home or just rely on manual navigation for now.
-    // DocumentStore selection logic is client side inside HomeView based on ID?
-    // Let's simpler: Store selected ID in store or URL.
-    // Ideally routing should be /documents/:id.
-    // But our HomeView is monolithic (sidebar + main).
-    // Let's just push to home (which might reset state) but simpler for MVP.
-    router.push('/'); 
-    // Ideally we would want to signal HomeView to open this doc.
-    // Can use query param ?docId=...
+    router.push(`/documents/${id}`);
 };
 
 onMounted(() => {

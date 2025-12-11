@@ -10,7 +10,7 @@ describe('Bookmark Integration Test', () => {
         cy.get('button').contains('Login').click();
         
         // Toggle EDIT mode
-        cy.get('button[value="EDIT"]').click();
+        cy.contains('button', 'Edit').click({ force: true });
 
         // Create Doc
         cy.contains('New Document').click();

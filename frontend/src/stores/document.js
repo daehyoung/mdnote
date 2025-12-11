@@ -10,15 +10,50 @@ export const useDocumentStore = defineStore('document', {
     loading: false,
     error: null,
     appMode: 'VIEW', // Added shared state for UI Mode
-    selectedCategoryId: null // Added shared state for Category Filter
+    // Pagination & Filter State
+    page: 1, // 1-based for Vuetify pagination
+    size: 10,
+    totalPages: 0,
+    totalElements: 0,
+    filterStatus: null, // For status filtering
+    selectedCategoryId: null, // For category filtering
   }),
   actions: {
     async fetchDocuments(categoryId = null) {
+      console.log('Store: fetchDocuments called with category:', categoryId);
       this.loading = true;
       try {
-        const url = categoryId ? `/documents?categoryId=${categoryId}` : '/documents';
-        const response = await api.get(url);
-        this.documents = response.data;
+        // Construct query params
+        const params = new URLSearchParams();
+        // Handle Category
+        // Note: categoryId argument overrides state if provided (for consistent valid usage)
+        // Check if we are "All Categories" (null) or specific
+        const targetCatId = categoryId !== undefined ? categoryId : this.selectedCategoryId;
+        if (targetCatId) {
+            params.append('categoryId', targetCatId);
+        }
+        
+        // Handle Pagination (Backend matches 0-based, Vuetify is 1-based)
+        params.append('page', this.page - 1); 
+        params.append('size', this.size);
+        
+        // Handle Status Filter
+        if (this.filterStatus) {
+            params.append('status', this.filterStatus);
+        }
+
+        const response = await api.get(`/documents?${params.toString()}`);
+        
+        // Handle Page response structure
+        if (response.data.content) {
+            this.documents = response.data.content;
+            this.totalPages = response.data.totalPages;
+            this.totalElements = response.data.totalElements;
+        } else {
+            // Fallback if backend returns list (shouldn't happen with new backend)
+            this.documents = response.data;
+            this.totalPages = 1; 
+        }
       } catch (error) {
         this.error = 'Failed to fetch documents';
         console.error(error);
@@ -175,6 +210,26 @@ export const useDocumentStore = defineStore('document', {
     },
     setSelectedCategoryId(id) {
         this.selectedCategoryId = id;
+        this.page = 1; // Reset to first page when category changes
+    },
+    setFilterStatus(status) {
+        this.filterStatus = status;
+        this.page = 1; // Reset to first page
+    },
+    setPage(page) {
+        this.page = page;
+    },
+    async searchDocuments(query) {
+        this.loading = true;
+        try {
+            const response = await api.get(`/search?q=${query}`);
+            this.documents = response.data;
+        } catch (error) {
+            this.error = 'Failed to search documents';
+            console.error(error);
+        } finally {
+            this.loading = false;
+        }
     }
   },
 });

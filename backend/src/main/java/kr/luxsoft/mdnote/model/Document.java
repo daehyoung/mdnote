@@ -52,6 +52,16 @@ public class Document {
     @lombok.EqualsAndHashCode.Exclude
     private List<Attachment> attachments;
 
+    @Column(columnDefinition = "boolean default true")
+    private boolean groupRead = true;
+    @Column(columnDefinition = "boolean default false")
+    private boolean groupWrite = false;
+
+    @Column(columnDefinition = "boolean default true")
+    private boolean publicRead = true;
+    @Column(columnDefinition = "boolean default false")
+    private boolean publicWrite = false;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

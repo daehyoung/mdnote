@@ -40,11 +40,22 @@ public class DocumentIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private kr.luxsoft.mdnote.repository.UserRepository userRepository;
+
     @BeforeEach
     public void setup() {
         // Safe test: Do not wipe DB
         // documentRepository.deleteAll();
         // attachmentRepository.deleteAll();
+        
+        // Ensure testuser exists for DocumentService lookup
+        if (userRepository.findByUsername("testuser").isEmpty()) {
+            kr.luxsoft.mdnote.model.User user = new kr.luxsoft.mdnote.model.User();
+            user.setUsername("testuser");
+            user.setPasswordHash("dummy"); // not used by mock user
+            userRepository.save(user);
+        }
     }
 
     @Test
@@ -94,9 +105,54 @@ public class DocumentIntegrationTest {
                 .andExpect(jsonPath("$.attachments[0].id").value(attId))
                 .andExpect(jsonPath("$.attachments[0].fileName").value(uploadedAtt.getFileName()));
 
-        // 5. Verify Attachment Content (Download)
         mockMvc.perform(get("/api/attachments/" + attId))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Hello Real Attachment World!"));
+    }
+    
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    public void testAdminAccessToPrivateDoc() throws Exception {
+        // Setup: Create a private document as "user1"
+        // Since we are mocking user as "admin", we need to manually create doc via repository or Service
+        
+        // 1. Ensure user1 exists
+        kr.luxsoft.mdnote.model.User user1;
+        if (userRepository.findByUsername("user1").isEmpty()) {
+            user1 = new kr.luxsoft.mdnote.model.User();
+            user1.setUsername("user1");
+            user1.setPasswordHash("pass");
+            user1.setRole("USER");
+            userRepository.save(user1);
+        } else {
+             user1 = userRepository.findByUsername("user1").get();
+        }
+        
+        // 2. Create Private Doc
+        Document privateDoc = new Document();
+        privateDoc.setTitle("Private Admin Test");
+        privateDoc.setContent("Secret");
+        privateDoc.setAuthor(user1);
+        privateDoc.setPublicRead(false);
+        privateDoc.setGroupRead(false);
+        documentRepository.save(privateDoc);
+        
+        // 3. Search as Admin (MockUser is Admin)
+        // Ensure Admin exists in DB for Service check (Service looks up findByUsername)
+        if (userRepository.findByUsername("admin").isEmpty()) {
+             kr.luxsoft.mdnote.model.User admin = new kr.luxsoft.mdnote.model.User();
+             admin.setUsername("admin");
+             admin.setPasswordHash("pass");
+             admin.setRole("ADMIN");
+             userRepository.save(admin);
+        }
+
+        mockMvc.perform(get("/api/documents")
+                .param("query", "Private Admin Test"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].title").value("Private Admin Test"));
+        
+        // 4. Cleanup
+        documentRepository.delete(privateDoc);
     }
 }

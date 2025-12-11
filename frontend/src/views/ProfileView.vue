@@ -14,6 +14,23 @@
                 disabled
             ></v-text-field>
             <v-text-field v-model="profile.role" label="Role" readonly disabled></v-text-field>
+            
+            <v-card-title class="px-0">Appearance</v-card-title>
+             <v-btn-toggle
+                v-model="currentTheme"
+                mandatory
+                color="primary"
+                @update:model-value="saveTheme"
+            >
+                <v-btn value="light">
+                    <v-icon start>mdi-white-balance-sunny</v-icon>
+                    Light
+                </v-btn>
+                <v-btn value="dark">
+                    <v-icon start>mdi-weather-night</v-icon>
+                    Dark
+                </v-btn>
+            </v-btn-toggle>
         </v-card-text>
         <v-card-actions>
             <v-btn color="primary" @click="updateInfo">Update Info</v-btn>
@@ -38,8 +55,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import api from '../services/api';
+import { useAuthStore } from '../stores/auth';
 
+const authStore = useAuthStore();
 const loading = ref(false);
 const profile = ref({
     username: '',
@@ -49,12 +67,18 @@ const profile = ref({
     department: null
 });
 const newPassword = ref('');
+const currentTheme = ref('light');
 
 const fetchProfile = async () => {
     loading.value = true;
     try {
-        const response = await api.get('/profile');
-        profile.value = response.data;
+        const data = await authStore.fetchProfile();
+        // Since store updates its own state, we could use that, 
+        // but keeping local ref synced for form editing is fine too.
+        profile.value = data;
+        if (data.theme) {
+            currentTheme.value = data.theme;
+        }
     } catch (e) {
         console.error("Failed to fetch profile", e);
     } finally {
@@ -62,12 +86,17 @@ const fetchProfile = async () => {
     }
 };
 
+const saveTheme = async (val) => {
+    try {
+        await authStore.updateTheme(val);
+    } catch (e) {
+        // Revert on error?
+    }
+};
+
 const updateInfo = async () => {
     try {
-        await api.put('/profile', {
-            name: profile.value.name,
-            email: profile.value.email
-        });
+        await authStore.updateProfile(profile.value.name, profile.value.email);
         alert("Profile updated");
     } catch (e) {
         alert("Failed to update profile");
@@ -77,7 +106,7 @@ const updateInfo = async () => {
 const changePassword = async () => {
     if (!newPassword.value) return;
     try {
-        await api.put('/profile/password', { password: newPassword.value });
+        await authStore.changePassword(newPassword.value);
         alert("Password changed");
         newPassword.value = '';
     } catch (e) {

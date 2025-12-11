@@ -5,20 +5,43 @@
         <v-col cols="12" class="d-flex flex-column fill-height pa-0 ma-0">
             <!-- List View -->
             <div v-if="!documentStore.currentDocument" class="d-flex flex-column fill-height pa-4">
-                 <div class="d-flex align-center mb-4">
+                 <div class="d-flex align-center mb-4 flex-wrap">
                     <h2 class="text-h5 mr-4">Documents</h2>
+                    
+                    <!-- Search Input with Explicit Button -->
                     <v-text-field
-                        v-model="searchQuery"
+                        v-model="searchQueryInput"
                         dense
                         outlined
                         hide-details
-                        prepend-inner-icon="mdi-magnify"
-                        label="Search Documents..."
-                        style="max-width: 400px;"
+                        label="Search..."
+                        style="max-width: 300px;"
                         clearable
-                        class="mr-4"
+                        class="mr-2"
+                        @keyup.enter="handleSearch"
                         id="search-input"
                     ></v-text-field>
+                    <v-btn icon @click="handleSearch" class="mr-4" title="Search">
+                        <v-icon>mdi-magnify</v-icon>
+                    </v-btn>
+                    
+                    <!-- Status Filter (Edit Mode Only) -->
+                     <v-select
+                        v-if="appMode === 'EDIT'"
+                        v-model="filterStatus"
+                        :items="['DRAFT', 'REVIEW', 'APPROVED', 'PUBLISHED', 'ARCHIVED']"
+                        label="Status"
+                        dense
+                        outlined
+                        hide-details
+                        clearable
+                        style="max-width: 150px;"
+                        class="mr-4"
+                        @update:modelValue="handleStatusFilter"
+                    ></v-select>
+
+                    <v-spacer></v-spacer>
+
                     <v-btn 
                         v-if="appMode === 'EDIT'"
                         color="primary" 
@@ -28,13 +51,13 @@
                     </v-btn>
                  </div>
                  
-                 <v-card variant="flat" class="flex-grow-1">
+                 <v-card variant="flat" class="flex-grow-1 d-flex flex-column">
                     <v-list v-if="documentStore.loading && !documentStore.documents.length">
                          <v-list-item>Loading...</v-list-item>
                     </v-list>
-                    <v-list v-else lines="two">
+                    <v-list v-else lines="two" class="flex-grow-1">
                         <v-list-item
-                            v-for="doc in visibleDocuments"
+                            v-for="doc in documentStore.documents"
                             :key="doc.id"
                             :value="doc.id"
                             @click="selectDocument(doc)"
@@ -46,23 +69,48 @@
                                     <v-icon>mdi-file-document-outline</v-icon>
                                 </v-avatar>
                             </template>
-                            <v-list-item-title class="font-weight-bold">{{ doc.title || 'Untitled' }}</v-list-item-title>
+                            <v-list-item-title class="font-weight-bold">
+                                {{ doc.title || 'Untitled' }} 
+                                <span class="text-caption text-grey ml-2" v-if="doc.author">by {{ doc.author.name || doc.author.username }}</span>
+                                <v-chip x-small v-if="appMode==='EDIT' && doc.status" class="ml-2" size="x-small" color="secondary" variant="outlined">{{ doc.status }}</v-chip>
+                            </v-list-item-title>
                             <v-list-item-subtitle>
                                 <span class="text-caption mr-2">{{ new Date(doc.createdAt).toLocaleDateString() }}</span>
-                                <v-chip size="x-small" label>{{ doc.category ? doc.category.name : 'Uncategorized' }}</v-chip>
+                                <v-chip size="x-small" label class="mr-1">{{ doc.category ? doc.category.name : 'Uncategorized' }}</v-chip>
+                                <v-chip 
+                                    v-for="tag in doc.tags" 
+                                    :key="tag.id" 
+                                    size="x-small" 
+                                    label 
+                                    variant="outlined" 
+                                    class="mr-1"
+                                >
+                                    {{ tag.name }}
+                                </v-chip>
                             </v-list-item-subtitle>
                         </v-list-item>
-                        <v-list-item v-if="!visibleDocuments.length">
+                        <v-list-item v-if="!documentStore.documents.length">
                             <v-list-item-title class="text-grey">No documents found.</v-list-item-title>
                         </v-list-item>
                     </v-list>
+
+                    <!-- Pagination -->
+                    <div class="d-flex justify-center pa-2 border-t" v-if="documentStore.totalPages > 1">
+                        <v-pagination
+                            v-model="currentPage"
+                            :length="documentStore.totalPages"
+                            :total-visible="7"
+                            @update:modelValue="handlePageChange"
+                            density="compact"
+                        ></v-pagination>
+                    </div>
                  </v-card>
             </div>
 
             <!-- Detail View -->
             <div v-else class="d-flex flex-column fill-height">
                  <!-- Back Button Header -->
-                  <v-toolbar dense flat color="grey-lighten-4" class="border-b">
+                  <v-toolbar dense flat class="border-b">
                        <v-btn icon @click="goBack" data-test="back-button">
                          <v-icon>mdi-arrow-left</v-icon>
                      </v-btn>
@@ -79,10 +127,10 @@
                             id="title-input"
                         ></v-text-field>
                         <v-spacer></v-spacer>
-                        <v-btn color="success" text @click="saveDocument" :disabled="!isDirty" data-test="save-button">
+                        <v-btn color="success" text @click="saveDocument" :disabled="!isDirty || !canEdit" v-if="canEdit" data-test="save-button">
                             Save
                         </v-btn>
-                        <v-btn color="error" icon @click="deleteDocument">
+                        <v-btn color="error" icon @click="deleteDocument" v-if="canDelete">
                             <v-icon>mdi-delete</v-icon>
                         </v-btn>
                         <input type="file" ref="fileInput" style="display: none" @change="handleFileUpload" id="file-input" />
@@ -96,7 +144,7 @@
                  </v-toolbar>
 
                 <!-- EDIT MODE Metadata -->
-                <div v-if="appMode === 'EDIT'" class="d-flex align-center pa-1 bg-grey-lighten-5">
+                <div v-if="appMode === 'EDIT'" class="d-flex align-center pa-1">
                     <v-autocomplete
                         v-model="editedCategoryId"
                         :items="flattenedCategories"
@@ -142,7 +190,7 @@
                         <div v-if="appMode === 'EDIT' && isEditMode" class="flex-grow-1 d-flex">
                             <textarea
                                 v-model="editedContent"
-                                class="pa-2 flex-grow-1"
+                                class="pa-2 flex-grow-1 text-high-emphasis bg-transparent"
                                 style="width: 100%; min-height: 500px; border: none; outline: none; resize: none; font-family: monospace;"
                                 placeholder="Type your markdown here..."
                                 id="content-editor"
@@ -168,7 +216,7 @@
                          "Edit Mode -> ... currently modification possible".
                          I'll hide attachments/comments in VIEW mode for strictly "View Only".
                     -->
-                    <div v-if="appMode === 'EDIT'" class="pa-4 bg-grey-lighten-4">
+                    <div v-if="appMode === 'EDIT'" class="pa-4">
                         <v-expansion-panels multiple v-model="openSidebarGroups">
                             <v-expansion-panel value="attachments" title="Attachments">
                                  <v-expansion-panel-text>
@@ -191,6 +239,24 @@
                                         </v-list-item>
                                     </v-list>
                                  </v-expansion-panel-text>
+                            </v-expansion-panel>
+                            
+                            <v-expansion-panel value="permissions" title="Permissions">
+                                <v-expansion-panel-text>
+                                    <v-row no-gutters>
+                                        <v-col cols="12">
+                                            <div class="text-subtitle-2 mb-2">Group (Department)</div>
+                                            <v-checkbox v-model="editedGroupRead" label="Read" density="compact" hide-details></v-checkbox>
+                                            <v-checkbox v-model="editedGroupWrite" label="Write" density="compact" hide-detailsMessages="Write permission includes delete"></v-checkbox>
+                                        </v-col>
+                                        <v-col cols="12" class="mt-2">
+                                            <v-divider></v-divider>
+                                            <div class="text-subtitle-2 mt-2 mb-2">General Public</div>
+                                            <v-checkbox v-model="editedPublicRead" label="Read" density="compact" hide-details></v-checkbox>
+                                            <v-checkbox v-model="editedPublicWrite" label="Write" density="compact" hide-detailsMessages="Write permission includes delete"></v-checkbox>
+                                        </v-col>
+                                    </v-row>
+                                </v-expansion-panel-text>
                             </v-expansion-panel>
                             
                             <v-expansion-panel value="comments" title="Comments">
@@ -244,7 +310,7 @@ const documentStore = useDocumentStore();
 const router = useRouter();
 const route = useRoute();
 
-const openSidebarGroups = ref(['attachments', 'comments']);
+const openSidebarGroups = ref(['attachments', 'comments', 'permissions']);
 // Using store state for app mode
 const appMode = computed(() => documentStore.appMode);
 
@@ -257,29 +323,94 @@ const editedStatus = ref('DRAFT');
 const isDirty = ref(false);
 const fileInput = ref(null);
 const newComment = ref('');
-const searchQuery = ref('');
-// selectedCategoryId is managed by Store/MainLayout now, 
-// but we might need it locally if we wanted to highlight logic here?
-// Actual filtering happens via fetchDocuments(catId) triggered by MainLayout.
-// We just need to access the store list.
+const searchQueryInput = ref('');
+const filterStatus = ref(null);
 
-const doSearch = () => {
-    if (searchQuery.value) {
-        router.push({ name: 'search', query: { q: searchQuery.value } });
+// Permission Refs
+const editedGroupRead = ref(true);
+const editedGroupWrite = ref(false);
+const editedPublicRead = ref(true);
+const editedPublicWrite = ref(false);
+
+
+// Permission Logic
+const canEdit = computed(() => {
+    if (!documentStore.currentDocument) return false;
+    // New doc (no ID) is always editable by creator
+    if (!documentStore.currentDocument.id) return true;
+    
+    const user = authStore.user;
+    if (!user) return false;
+    if (user.role === 'ADMIN') return true;
+    
+    const author = documentStore.currentDocument.author;
+    // If no author set (legacy), maybe allow? Or deny? Sticking to stricter: deny.
+    // Wait, createNewDocument sets author on backend. 
+    // If viewing a doc, author should be there.
+    if (!author) return false; 
+    
+    // Owner check
+    if (author.username === user.username) return true;
+    
+    // Group Write
+    if (documentStore.currentDocument.groupWrite && user.department && author.department && user.department.id === author.department.id) return true;
+    
+    // Public Write
+    if (documentStore.currentDocument.publicWrite) return true;
+
+    return false;
+});
+
+const canDelete = computed(() => {
+    // Delete is now same as Edit/Write permission
+    return canEdit.value;
+});
+
+// Pagination Model
+// We sync with store
+const currentPage = computed({
+    get: () => documentStore.page,
+    set: (val) => documentStore.setPage(val)
+});
+
+const handleSearch = () => {
+    if (searchQueryInput.value) {
+        // Use Store search or Router push to Search View?
+        // Current impl uses router push to 'search' view/route?
+        // Wait, "search" route wasn't in list view.
+        // User asked: "검색도 단어 입력후 검색 버튼 누르면 검색하도록 변경해줘"
+        // Previous logic: doSearch() pushed to router query 'q'.
+        // Let's keep that pattern if there is a separate search view or if it stays on home.
+        // If stays on home, we might need SEARCH endpoint support in pagination?
+        // User asked for "All Categories ... Paging".
+        // If searching, we usually use the /search endpoint.
+        // Does /search endpoint support pagination? Not yet.
+        // BUT, if I implement search into the main list API (like filter), it would be better.
+        // However, I updated SearchController separately.
+        // Let's assume for now, Search is a separate mode/view or uses the separate API.
+        // I will route to 'search' view or use store.searchDocuments logic.
+        // Let's stick to existing:
+        documentStore.searchDocuments(searchQueryInput.value); // This calls /search/ which is list (not paged yet)
+        // Ideally Search should be paginated too, but user didn't explicitly ask for Paged Search, just "Paging for List".
+        // They asked "Search -> Button Trigger".
+        // I will trigger the store search action.
+    } else {
+        // Clear search, reload list
+        fetchDocuments();
     }
 };
 
-// Computed property to filter the ALREADY fetched documents (which are by category or all) locally by search query
-const visibleDocuments = computed(() => {
-    let docs = documentStore.documents;
-    if (searchQuery.value) {
-        const q = searchQuery.value.toLowerCase();
-        docs = docs.filter(d => 
-            d.title.toLowerCase().includes(q) 
-        );
-    }
-    return docs;
-});
+const handlePageChange = () => {
+    fetchDocuments();
+};
+
+const handleStatusFilter = () => {
+    documentStore.setFilterStatus(filterStatus.value);
+    fetchDocuments();
+};
+
+// Removed visibleDocuments computed property as we now display documentStore.documents directly (server-side paged)
+// Only client-side logic remaining: none. We rely on store state.
 
 const compiledMarkdown = computed(() => {
   return marked(editedContent.value || '');
@@ -323,6 +454,12 @@ const loadDocument = async (docId) => {
     editedCategoryId.value = fullDoc.category ? fullDoc.category.id : null;
     editedStatus.value = fullDoc.status || 'DRAFT';
     
+    // Permissions
+    editedGroupRead.value = fullDoc.groupRead !== undefined ? fullDoc.groupRead : true;
+    editedGroupWrite.value = fullDoc.groupWrite || false;
+    editedPublicRead.value = fullDoc.publicRead !== undefined ? fullDoc.publicRead : true;
+    editedPublicWrite.value = fullDoc.publicWrite || false;
+    
     isEditMode.value = false; // Default to preview mode on select
     if (appMode.value === 'EDIT') {
         isEditMode.value = true;
@@ -352,7 +489,12 @@ const saveDocument = async () => {
             category: editedCategoryId.value ? { id: editedCategoryId.value } : null,
             status: editedStatus.value,
             tags: editedTags.value.map(name => ({ name })), // Send as objects
-            attachments: documentStore.currentDocument.attachments // Send attachments list to link them
+            attachments: documentStore.currentDocument.attachments, // Send attachments list to link them
+            // Permissions
+            groupRead: editedGroupRead.value,
+            groupWrite: editedGroupWrite.value,
+            publicRead: editedPublicRead.value,
+            publicWrite: editedPublicWrite.value
         });
         isDirty.value = false;
         // alert('Document saved successfully'); // Simple feedback
@@ -479,14 +621,17 @@ const goBack = () => {
 };
 
 // Watch for changes to track dirty state
-watch([editedTitle, editedContent, editedTags, editedStatus, editedCategoryId], () => {
+// Watch for changes to track dirty state
+watch([editedTitle, editedContent, editedTags, editedStatus, editedCategoryId, editedGroupRead, editedGroupWrite, editedPublicRead, editedPublicWrite], () => {
     if (documentStore.currentDocument) {
         isDirty.value = true;
     }
 });
 
-onMounted(() => {
-    fetchDocuments();
+onMounted(async () => {
+    console.log('HomeView Mounted');
+    await fetchDocuments();
+    console.log('HomeView fetchDocuments called. Documents:', documentStore.documents.length);
     if (route.params.id) {
         loadDocument(route.params.id);
     }
