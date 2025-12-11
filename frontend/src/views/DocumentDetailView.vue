@@ -24,6 +24,15 @@
                     </v-toolbar-title>
                     
                     <v-spacer></v-spacer>
+
+                    <v-btn
+                        icon
+                        @click="downloadMarkdown"
+                        class="mr-2"
+                        title="Download Markdown"
+                    >
+                        <v-icon>mdi-download</v-icon>
+                    </v-btn>
                     
                     <v-btn 
                         v-if="canEdit" 
@@ -147,6 +156,21 @@ const theme = useTheme();
 const markdownTheme = computed(() => {
     return theme.global.current.value.dark ? 'dark' : 'light';
 });
+
+const downloadMarkdown = () => {
+    const doc = documentStore.currentDocument;
+    if (!doc) return;
+
+    const blob = new Blob([doc.content], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${doc.title || 'document'}.md`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+};
 
 const newComment = ref('');
 
