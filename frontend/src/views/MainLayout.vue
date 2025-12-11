@@ -38,7 +38,7 @@
       </div>
       <v-divider></v-divider>
       <v-list-subheader>Categories</v-list-subheader>
-      <v-list dense nav>
+      <v-list density="compact" nav class="sidebar-list">
           <v-list-item
               prepend-icon="mdi-folder-outline"
               title="All Categories"
@@ -61,6 +61,27 @@
     </v-main>
   </v-layout>
 </template>
+
+<style scoped>
+/* Reduce gap between icon and text by half */
+.sidebar-list :deep(.v-list-item__prepend) {
+    margin-inline-end: 8px !important; /* Default is usually around 16px-32px depending on explicit width */
+    width: 24px !important; /* Force tighter icon width if needed */
+    min-width: 24px !important;
+}
+
+/* Reduce vertical padding/spacing by half */
+.sidebar-list :deep(.v-list-item) {
+    min-height: 32px !important; /* Reduce height */
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+}
+
+/* Ensure nested RecursiveList doesn't double-pad or reset */
+.sidebar-list :deep(.v-list-group__items .v-list-item) {
+   padding-inline-start: 16px !important; /* Keep indent but tight vertically */
+}
+</style>
 
 <script setup>
 import { ref, onMounted } from 'vue';
