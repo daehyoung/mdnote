@@ -13,6 +13,12 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private kr.luxsoft.mdnote.security.JwtTokenProvider jwtTokenProvider;
+
+    @org.springframework.beans.factory.annotation.Value("${app.auth.type:simple}")
+    private String authType;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -22,11 +28,15 @@ public class SecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/api/admin/**")).hasRole("ADMIN")
-                 // Allow H2 console if we use H2, but we use Postgres. 
-                 // Allow all for now during dev to facilitate testing
                 .anyRequest().permitAll() 
-            )
-            .addFilterBefore(new kr.luxsoft.mdnote.security.DevAuthFilter(), org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
+            );
+
+        if ("jwt".equalsIgnoreCase(authType)) {
+            http.addFilterBefore(new kr.luxsoft.mdnote.security.JwtAuthFilter(jwtTokenProvider), org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
+        } else {
+            http.addFilterBefore(new kr.luxsoft.mdnote.security.DevAuthFilter(), org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
+        }
+        
         return http.build();
     }
 

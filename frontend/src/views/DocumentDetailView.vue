@@ -46,6 +46,7 @@
                             v-html="compiledViewMarkdown"
                             style="min-height: 500px;"
                             :data-theme="markdownTheme"
+                            :key="markdownTheme"
                         ></div>
                     </div>
     
@@ -154,7 +155,14 @@ const compiledViewMarkdown = computed(() => {
 });
 
 // Watch for changes and render mermaid
-watch(compiledViewMarkdown, async () => {
+watch([compiledViewMarkdown, markdownTheme], async () => {
+    // 1. Initialize Mermaid with correct theme
+    mermaid.initialize({ 
+        startOnLoad: false,
+        theme: markdownTheme.value === 'dark' ? 'dark' : 'default',
+        securityLevel: 'loose'
+    });
+
     await nextTick();
     try {
         await mermaid.run({

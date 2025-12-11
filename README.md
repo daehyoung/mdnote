@@ -37,8 +37,22 @@
     * 파일 첨부
     * 문서 댓글 관리
     * 문서 공유 관리
-
     * 마크다운 보기
+    * 소유자
+    * 커멘트 여부
+    * 권한 설정
+        * 일반(PUBLIC) 읽기/쓰기
+        * 소속 기관별 권한 읽기/쓰기
+    * 문서 상태(라이프사이클) 관리 - 작성, 승인요청, 검토, 승인, 배포, 폐기
+
+
+* VIEW
+    - 카테고리별 문서 목록 표시
+    - PUBLISHED 문서만 표시
+* EDIT
+    - 카테고리별 문서 목록 표시
+    - 전체 문서 표시
+
 
 
 * 문서 관리 - 문서 작성, 수정, 삭제, 복사, 이동, 복사
@@ -50,7 +64,8 @@
 * backend
     * java, spring boot 3, jpa, postgresql, open api spec yml
 * frontend
-    * vuejs, vuetify, pinia, router, layout
+    * vuejs, vuetify, pinia, router, app-layout
+
 
 ## 개발 절차
 * 기능별 WBS 작성
@@ -69,6 +84,15 @@
 
 
 
+
+curl -X 'POST' \
+  'http://localhost:8080/api/v1/auth/login' \                                    
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "username": "admin",
+  "password": "admin"
+}' 
  
 
 

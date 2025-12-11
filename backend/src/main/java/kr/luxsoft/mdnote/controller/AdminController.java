@@ -2,6 +2,7 @@ package kr.luxsoft.mdnote.controller;
 
 import kr.luxsoft.mdnote.model.User;
 import kr.luxsoft.mdnote.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin") 
+@Slf4j
 public class AdminController {
 
     @Autowired
@@ -52,7 +54,7 @@ public class AdminController {
     }
     @PostMapping("/users")
     public ResponseEntity<User> createUser(@RequestBody User user) {
-        System.out.println("AdminController: Creating user " + user.getUsername());
+        log.debug("AdminController: Creating user {}", user.getUsername());
         // Default values
         if (user.getStatus() == null) user.setStatus("ACTIVE");
         if (user.getRole() == null) user.setRole("USER");

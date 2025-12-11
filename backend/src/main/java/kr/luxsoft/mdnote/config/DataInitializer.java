@@ -2,12 +2,14 @@ package kr.luxsoft.mdnote.config;
 
 import kr.luxsoft.mdnote.model.User;
 import kr.luxsoft.mdnote.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class DataInitializer implements CommandLineRunner {
 
     @Autowired
@@ -23,10 +25,7 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         createUserIfNotFound("admin", "admin", "ADMIN");
-        createUserIfNotFound("test", "test", "USER");
-        createUserIfNotFound("admin", "admin", "ADMIN");
-        createUserIfNotFound("test", "test", "USER");
-        
+        createUserIfNotFound("test", "test", "USER"); 
         createCategories();
     }
 
@@ -50,7 +49,7 @@ public class DataInitializer implements CommandLineRunner {
             hr.setName("Human Resources");
             categoryRepository.save(hr);
             
-            System.out.println("Seeded categories");
+            log.debug("Seeded categories");
         }
     }
 
@@ -63,7 +62,7 @@ public class DataInitializer implements CommandLineRunner {
             user.setRole(role);
             user.setStatus("ACTIVE");
             userRepository.save(user);
-            System.out.println("Created user: " + username);
+            log.debug("Created user: {}", username);
         }
     }
 }

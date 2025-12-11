@@ -3,9 +3,11 @@ package kr.luxsoft.mdnote.service;
 import kr.luxsoft.mdnote.model.Document;
 import kr.luxsoft.mdnote.repository.DocumentRepository;
 import kr.luxsoft.mdnote.repository.TagRepository;
+import lombok.extern.slf4j.Slf4j;
 import kr.luxsoft.mdnote.model.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import kr.luxsoft.mdnote.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +16,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 @Service
+@Slf4j
 public class DocumentService {
 
     @Autowired
@@ -25,7 +27,7 @@ public class DocumentService {
     private TagRepository tagRepository;
 
     @Autowired
-    private kr.luxsoft.mdnote.repository.UserRepository userRepository;
+    private UserRepository userRepository;
 
     public Page<Document> getAllDocuments(Long categoryId, String status, String query, Pageable pageable, String username) {
         kr.luxsoft.mdnote.model.User currentUser = userRepository.findByUsername(username)
@@ -108,6 +110,8 @@ public class DocumentService {
     public void deleteDocument(Long id, String username) {
         kr.luxsoft.mdnote.model.User currentUser = userRepository.findByUsername(username)
             .orElseThrow(() -> new RuntimeException("User not found"));
+            
+        log.debug("DEBUG: Attempting delete doc {} by user {} role {}", id, username, currentUser.getRole());
             
         Document document = documentRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Document not found"));

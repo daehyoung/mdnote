@@ -98,6 +98,7 @@
                             v-html="compiledMarkdown"
                             style="min-height: 500px;"
                             :data-theme="markdownTheme"
+                            :key="markdownTheme"
                         ></div>
                     </div>
     
@@ -347,8 +348,15 @@ watch([editedTitle, editedContent, editedTags, editedStatus, editedCategoryId, e
 });
 
 // Watch for changes and render mermaid in preview
-watch([compiledMarkdown, showPreview], async () => {
+watch([compiledMarkdown, showPreview, markdownTheme], async () => {
     if (showPreview.value) {
+        // Initialize Mermaid with correct theme
+        mermaid.initialize({ 
+            startOnLoad: false,
+            theme: markdownTheme.value === 'dark' ? 'dark' : 'default',
+            securityLevel: 'loose'
+        });
+
         await nextTick();
         try {
             await mermaid.run({

@@ -18,11 +18,15 @@ marked.use(markedKatex({
 
 // Configure Mermaid Renderer
 const renderer = {
-  code(code, infostring) {
-    if (infostring === 'mermaid') {
-      return `<div class="mermaid">${code}</div>`;
+  code(token) {
+    if (typeof token === 'object' && token.lang === 'mermaid') {
+      return `<div class="mermaid">${token.text}</div>`;
     }
-    return false; // Delegate to other renderers
+    // Fallback for string signature (if needed)
+    if (arguments.length > 1 && arguments[1] === 'mermaid') {
+       return `<div class="mermaid">${token}</div>`;
+    }
+    return false;
   }
 };
 

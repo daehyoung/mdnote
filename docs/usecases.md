@@ -26,40 +26,43 @@
 
 ## 2. Document Management
 
-### 2.1 Create Document (Storyboard)
-**Actor**: Author
-1.  **Author** clicks "New Document" in Sidebar.
-2.  **System** opens **Document Editor** (in "Draft" status).
-    *   *Title*: Empty.
-    *   *Content*: Empty (Edit Mode).
-3.  **Author** enters Title: "Q4 Roadmap".
-4.  **Author** types Markdown content in Editor pane.
-    *   *System* auto-renders Preview in right pane.
-5.  **Author** opens "Settings" panel (right sidebar/drawer).
-    *   Selects **Category**: "Product Planning" (from Tree).
-    *   Adds **Tags**: "Q4", "Roadmap".
-6.  **Author** clicks "Attach File" icon in Toolbar.
-    *   Selects `diagram.png` from OS dialog.
-    *   *System* uploads file `POST /attachments` and returns ID/URL.
-    *   *System* inserts `![diagram.png](/files/diagram.png)` into Markdown.
-7.  **Author** clicks "Save".
-    *   *System* saves document via `POST /documents`.
-    *   *System* shows notification "Document Saved".
+### 2.1 View Document List (Home)
+**Actor**: User
+1.  **User** logs in or visits `/`.
+2.  **System** displays **Document List**:
+    *   Left Sidebar: Category Tree.
+    *   Main Area: List of documents.
+    *   **Filter Rule**: Only "PUBLISHED" documents are shown in this View mode.
+3.  **User** can filter by Status (All/Draft/Published/etc.) if allowed or search by keyword.
+4.  **User** clicks on a document to Read.
 
-### 2.2 Document Lifecycle (Approval Flow)
-**Actor**: Author, Reviewer
-1.  **Author** (on "Q4 Roadmap") changes Status dropdown from "Draft" to "Request Approval".
-2.  **System** updates status.
-3.  **Reviewer** logs in. sees "Pending approvals" in Dashboard (Future feature) or finds doc via Search.
-4.  **Reviewer** opens "Q4 Roadmap".
-5.  **Reviewer** reviews content.
-6.  **Reviewer** clicks "Add Comment" button at bottom.
-    *   Types: "Looks good, but update the dates."
-    *   Clicks "Post".
-    *   *System* adds comment to list.
-7.  **Reviewer** clicks "Approve" button (if satisfied) or "Reject".
-    *   Action: "Approve" -> Status becomes "PUBLISHED".
-    *   Action: "Reject" -> Status becomes "DRAFT".
+### 2.2 Create / Edit Document
+**Actor**: Author (or User with Write Permission)
+1.  **Author** clicks "New Document" or "Edit" on an existing document.
+2.  **System** opens **Document Edit View** (`/documents/:id/edit`).
+3.  **Author** edits Title and Content (Markdown).
+4.  **Author** manages **Metadata** (Top Bar & Side Panel):
+    *   **Category**: Selects parent category.
+    *   **Tags**: Adds/Removes tags.
+    *   **Status**: Change lifecycle (Draft -> Review -> Published).
+5.  **Author** manages **Permissions**:
+    *   **Group Access**: Toggle Read/Write for their department.
+    *   **Public Access**: Toggle Read/Write for all users.
+6.  **Author** manages **Settings**:
+    *   **Allow Comments**: Toggles whether comments are enabled for this doc.
+7.  **Author** saves via "Save" button.
+
+### 2.3 Read Document (Detail View)
+**Actor**: User
+1.  **User** clicks on a document from the list.
+2.  **System** opens **Document Detail View** (`/documents/:id`).
+    *   Read-only Markdown content.
+    *   Header: Title, Tags.
+    *   Footer: Author info, Permission badges.
+3.  **System** displays **Comments Section** (if "Allow Comments" is ON).
+    *   User can read existing comments.
+    *   User can add a new comment (if logged in).
+4.  **System** shows "Edit" button ONLY if user has write permission (Owner, Admin, or Group/Public Write).
 
 ### 2.3 Search Documents
 **Actor**: User

@@ -22,6 +22,14 @@ spring:
 file:
   upload-dir: /app/uploads
 
+app:
+  auth:
+    # type: simple # Options: 'simple' (default) or 'jwt'
+    type: jwt
+  jwt:
+    secret: thisIsASecretKeyThatIsLongEnoughForHS256AlgorithmToBeSecureAndSafeToUseForDevelopment
+    expiration: 3600000 
+
 
 springdoc:
   api-docs:
