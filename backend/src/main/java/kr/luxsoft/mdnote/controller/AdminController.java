@@ -4,14 +4,12 @@ import kr.luxsoft.mdnote.model.User;
 import kr.luxsoft.mdnote.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin")
-// @PreAuthorize("hasRole('ADMIN')") // In our basic setup, we might rely on Frontend hiding or filter.
+@RequestMapping("/api/admin") 
 public class AdminController {
 
     @Autowired

@@ -3,8 +3,7 @@ package kr.luxsoft.mdnote.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import java.util.List;
+import lombok.AllArgsConstructor; 
 
 @Entity
 @Data
