@@ -1,0 +1,29 @@
+{
+  "name": "md-note-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test:e2e": "cypress open",
+    "test:e2e:headless": "cypress run"
+  },
+  "dependencies": {
+    "@mdi/font": "^7.2.96",
+    "axios": "^1.4.0",
+    "marked": "^17.0.1",
+    "pinia": "^2.1.0",
+    "roboto-fontface": "*",
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.0",
+    "vuetify": "^3.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.2.0",
+    "cypress": "^15.7.1",
+    "sass": "^1.60.0",
+    "vite": "^4.3.0"
+  }
+}

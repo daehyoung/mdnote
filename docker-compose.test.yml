@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  backend-test:
+    image: maven:3.9-eclipse-temurin-17-focal
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mdnote
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    networks:
+      - md-note_default
+    command: mvn test -Dtest=DocumentIntegrationTest
+
+networks:
+  md-note_default:
+    external: true
