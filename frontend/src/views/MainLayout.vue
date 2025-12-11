@@ -12,10 +12,10 @@
           class="mx-4"
           @update:model-value="updateAppMode"
       >
-          <v-btn value="VIEW">
+          <v-btn value="VIEW" data-test="mode-view">
               <v-icon left>mdi-eye</v-icon> View
           </v-btn>
-          <v-btn value="EDIT">
+          <v-btn value="EDIT" data-test="mode-edit">
               <v-icon left>mdi-pencil</v-icon> Edit
           </v-btn>
       </v-btn-toggle>

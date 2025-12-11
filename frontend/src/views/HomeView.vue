@@ -42,7 +42,7 @@
                     <v-spacer></v-spacer>
 
                     <v-btn 
-                        v-if="isAuthorizedForNewDoc"
+                        v-if="isAuthorizedForNewDoc && appMode === 'EDIT'"
                         color="primary" 
                         @click="createNewDocument"
                     >

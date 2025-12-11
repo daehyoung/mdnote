@@ -14,7 +14,7 @@ describe('URL Navigation and Deep Linking', () => {
       cy.visit('/');
 
       // 1.1 Toggle to EDIT mode
-      cy.contains('button', 'Edit').click({ force: true });
+      cy.get('[data-test="mode-edit"]').click({ force: true });
       
       // 2. Create a document to ensure list is not empty (optional, but good for isolation)
       // Or just click first item if exists
@@ -28,10 +28,28 @@ describe('URL Navigation and Deep Linking', () => {
       
       // Extract ID
       cy.url().then(url => {
-          const docId = url.split('/').pop();
+          let docId = url.split('/').pop();
+          if (docId === 'edit' || docId.includes('?')) {
+              // Handle /edit or query params
+              const pathParts = url.split('?')[0].split('/');
+              // If ends with edit
+              if (pathParts[pathParts.length - 1] === 'edit') {
+                  docId = pathParts[pathParts.length - 2];
+              } else {
+                  docId = pathParts[pathParts.length - 1];
+              }
+          }
           
           // 3. Go back to Home
           cy.get('[data-test="back-button"]').click();
+          // Initially goes to Detail View if saved recently or logic implies
+          // Check if we are still in documents path
+          cy.url().then((newUrl) => {
+              if (newUrl.includes('/documents/')) {
+                 // Click back again to go to list
+                 cy.get('[data-test="back-button"]').click();
+              }
+          });
           cy.url().should('not.include', '/documents/'); // Should be root or just not have ID
           
           // 4. Visit directly via URL (Deep Link)

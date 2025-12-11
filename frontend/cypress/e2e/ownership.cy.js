@@ -8,11 +8,10 @@ describe('Document Ownership', () => {
     // We need a 'user2' to verify denial.
     // For now, let's verify:
     // 1. 'test' creates a document.
-    // 2. 'test' sees Edit/Delete buttons.
-    // 3. 'test' logs out.
-    // 4. 'admin' logs in, sees Edit/Delete buttons (ADMIN override).
-    
-    // To verify denial, we'd need another standard user. We can use 'admin' creating a doc and 'test' trying to delete it?
+    // Use unique timestamp to prevent stale data from failing assertions
+    const timestamp = Date.now();
+    const adminDocTitle = `Admin Doc for Protection Test ${timestamp}`;
+    const userDocTitle = `User Doc for Admin deletion ${timestamp}`;
     // Yes, 'admin' is author='admin'. 'test' is NOT admin and NOT 'admin'.
     
     const login = (username, password) => {
@@ -24,7 +23,7 @@ describe('Document Ownership', () => {
         cy.url().should('not.include', '/login');
         cy.contains('Documents').should('be.visible');
         // Ensure Edit mode is active
-        cy.contains('button', 'Edit').click({ force: true });
+        cy.get('[data-test="mode-edit"]').click({ force: true });
         cy.contains('New Document').should('be.visible');
     };
 
@@ -36,7 +35,17 @@ describe('Document Ownership', () => {
         cy.get('#title-input').clear().type('User Owned Doc');
         cy.get('#content-editor').type('My Content');
         cy.contains('Save').click();
-        cy.contains('button', 'Edit').should('be.visible'); // Is in Edit Mode
+        
+        // DocumentEditView stays on page after save.
+        // We need to go back to DetailView to verify "Edit" button existence from there
+        cy.get('[data-test="back-button"]').click();
+        
+        cy.url().should('include', '/documents/');
+        cy.get('[data-test="edit-document-button"]').click(); // Go back to Edit Mode
+        
+        cy.get('[data-test="edit-document-button"]').should('not.exist'); // Wait, toggle is in HomeView only? No, global navigation?
+        // App.vue usually has toolbar? No, HomeView has the toggle.
+        // DetailView has specific "Edit" button.
         
         // Verify Edit/Delete buttons visible
         cy.get('[data-test="save-button"]').should('exist');
@@ -44,11 +53,16 @@ describe('Document Ownership', () => {
     });
 
     it('Non-owner cannot delete Admin document', () => {
-        // 1. Admin creates doc
+        // 1. Admin creates doc separate from others
         login(adminUser.username, adminUser.password);
         cy.contains('New Document').click();
-        cy.get('#title-input').clear().type('Admin Doc for Protection Test');
+        cy.get('#title-input').clear().type(adminDocTitle);
         cy.get('#content-editor').type('Protected Content');
+        
+        // PUBLISH it so other users can see it
+        cy.get('#status-selector').parent().click(); // Open dropdown
+        cy.contains('PUBLISHED').click(); // Select
+        
         cy.contains('Save').click();
         
         cy.window().then((win) => {
@@ -63,9 +77,12 @@ describe('Document Ownership', () => {
         login(testUser.username, testUser.password);
         
         // 3. Find Admin Doc
-        cy.contains('Admin Doc for Protection Test').click();
+        cy.contains(adminDocTitle).click();
         
         // 4. Verify Delete Button NOT present
+        // In Detail View, Delete is NOT present regardless.
+        // User shouldn't see "Edit" button either if no permission.
+        cy.get('[data-test="edit-document-button"]').should('not.exist');
         cy.get('.mdi-delete').should('not.exist');
         
         // 5. Verify Save Button disabled or not present
@@ -76,8 +93,12 @@ describe('Document Ownership', () => {
         // 1. User creates doc
         login(testUser.username, testUser.password);
         cy.contains('New Document').click();
-        cy.get('#title-input').clear().type('User Doc for Admin deletion');
+        cy.get('#title-input').clear().type(userDocTitle);
         cy.contains('Save').click();
+        
+        // DocumentEditView stays on page after save.
+        // Go back to list to ensure it's there? Or logout/re-login implies list visit.
+        
         cy.wait(500);
 
         cy.clearLocalStorage();
@@ -85,9 +106,15 @@ describe('Document Ownership', () => {
 
         // 2. Admin logs in
         login(adminUser.username, adminUser.password);
-        cy.contains('User Doc for Admin deletion').click();
+        // Admin needs Edit mode to see DRAFTs (if user didn't publish)
+        cy.get('[data-test="mode-edit"]').click({ force: true });
+        
+        cy.contains(userDocTitle).click();
         
         // 3. Admin sees delete button
+        // Must go to Edit View
+        cy.get('[data-test="edit-document-button"]').click();
+        
         cy.get('.mdi-delete').should('exist');
         cy.get('.mdi-delete').click({force: true});
         
@@ -100,6 +127,6 @@ describe('Document Ownership', () => {
         
         // Verify deleted
         cy.wait(1000);
-        cy.contains('User Doc for Admin deletion').should('not.exist');
+        cy.contains(userDocTitle).should('not.exist');
     });
 });

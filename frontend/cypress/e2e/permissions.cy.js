@@ -132,7 +132,7 @@ describe('Document Permissions Grannular', () => {
 
     it('Owner (test) can set Public Write = False, Admin can still edit', () => {
         login('test', 'test');
-        cy.contains('button', 'Edit').click({ force: true }); // Enable Edit Mode
+        cy.get('[data-test="mode-edit"]').click({ force: true }); // Enable Edit Mode
         // Create
         cy.contains('New Document', {timeout: 10000}).should('be.visible').click();
         cy.get('#title-input').clear().type('Public Write Test');
@@ -157,8 +157,11 @@ describe('Document Permissions Grannular', () => {
         
         // Login as Admin
         login(admin.user, admin.pass);
+        // Admin needs Edit mode to see DRAFTs
+        cy.get('[data-test="mode-edit"]').click({ force: true });
+        
         cy.contains('Public Write Test').click();
-        cy.contains('button', 'Edit').click({ force: true }); // Enable Edit Mode
+        cy.get('[data-test="edit-document-button"]').click({ force: true }); // Enable Edit Mode via Doc Button
         cy.get('[data-test="save-button"]').should('exist');
         
         logout();
@@ -170,10 +173,13 @@ describe('Document Permissions Grannular', () => {
          // reload list to be sure
          cy.visit('/');
          // 1. Switch to Edit Mode FIRST (so loadDocument sees correct mode)
-         cy.contains('button', 'Edit').click({ force: true }); 
+         cy.get('[data-test="mode-edit"]').click({ force: true }); 
          
          // 2. Open Document
          cy.contains('Public Write Test').click();
+         
+         // 3. Click Edit
+         cy.get('[data-test="edit-document-button"]').click({ force: true });
          
          // Should be editable
          cy.get('[data-test="save-button"]').should('exist');

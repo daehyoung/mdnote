@@ -213,8 +213,10 @@ export const useDocumentStore = defineStore('document', {
              this.currentDocument.attachments.push(attachment);
         }
     },
-    setAppMode(mode) {
+    async setAppMode(mode) {
         this.appMode = mode;
+        // Refresh list to apply new mode-based filters (e.g., show DRAFTs in EDIT mode)
+        await this.fetchDocuments();
     },
     setSelectedCategoryId(id) {
         this.selectedCategoryId = id;

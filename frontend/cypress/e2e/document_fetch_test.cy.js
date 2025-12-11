@@ -14,7 +14,7 @@ describe('Document Store & API Verification', () => {
 
     // Visit the home page
     cy.visit('/');
-    cy.get('#debug-mount').should('be.visible');
+    // cy.get('#debug-mount').should('be.visible'); // Removed as not present
 
     // Wait for the API call to complete
     cy.wait('@getDocuments', { timeout: 5000 }).then((interception) => {

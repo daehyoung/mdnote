@@ -17,17 +17,18 @@
                         class="ml-0 mr-4"
                         density="compact"
                         style="max-width: 400px;" 
+                        id="title-input"
                     ></v-text-field>
                     
                     <v-spacer></v-spacer>
                     
-                    <v-btn color="success" text @click="saveDocument" :disabled="!isDirty" class="mr-2">
+                    <v-btn color="success" text @click="saveDocument" :disabled="!isDirty" class="mr-2" data-test="save-button">
                         Save
                     </v-btn>
                     <v-btn color="error" icon @click="deleteDocument" v-if="canDelete">
                         <v-icon>mdi-delete</v-icon>
                     </v-btn>
-                    <input type="file" ref="fileInput" style="display: none" @change="handleFileUpload" />
+                    <input type="file" ref="fileInput" style="display: none" @change="handleFileUpload" id="file-input" />
                     <v-btn icon @click="triggerFileUpload" title="Upload Attachment">
                         <v-icon>mdi-paperclip</v-icon>
                     </v-btn>
@@ -72,6 +73,7 @@
                         density="compact"
                         hide-details
                         style="max-width: 150px;"
+                        id="status-selector"
                     ></v-select>
                 </div>
 
@@ -85,6 +87,7 @@
                                 class="pa-4 flex-grow-1 text-high-emphasis bg-transparent"
                                 style="width: 100%; min-height: 500px; border: none; outline: none; resize: none; font-family: monospace;"
                                 placeholder="Type your markdown here..."
+                                id="content-editor"
                             ></textarea>
                         </div>
                         
@@ -94,6 +97,7 @@
                             class="pa-4 flex-grow-1 markdown-body"
                             v-html="compiledMarkdown"
                             style="min-height: 500px;"
+                            :data-theme="markdownTheme"
                         ></div>
                     </div>
     
@@ -156,17 +160,23 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import { useAuthStore } from '../stores/auth';
 import { useDocumentStore } from '../stores/document';
 import { useRouter, useRoute } from 'vue-router';
-import { marked } from 'marked';
 import { uploadFile } from '../services/api';
+import { marked, mermaid } from '../utils/markdown';
+import { useTheme } from 'vuetify';
 
 const authStore = useAuthStore();
 const documentStore = useDocumentStore();
 const router = useRouter();
 const route = useRoute();
+const theme = useTheme();
+
+const markdownTheme = computed(() => {
+    return theme.global.current.value.dark ? 'dark' : 'light';
+});
 
 const openSidebarGroups = ref(['attachments', 'comments', 'permissions']);
 const showPreview = ref(false);
@@ -333,6 +343,20 @@ const goBack = () => {
 watch([editedTitle, editedContent, editedTags, editedStatus, editedCategoryId, editedGroupRead, editedGroupWrite, editedPublicRead, editedPublicWrite, editedAllowComments], () => {
     if (documentStore.currentDocument) {
         isDirty.value = true;
+    }
+});
+
+// Watch for changes and render mermaid in preview
+watch([compiledMarkdown, showPreview], async () => {
+    if (showPreview.value) {
+        await nextTick();
+        try {
+            await mermaid.run({
+                nodes: document.querySelectorAll('.mermaid')
+            });
+        } catch (e) {
+            console.error('Mermaid render error:', e);
+        }
     }
 });
 

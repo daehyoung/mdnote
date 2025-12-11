@@ -18,7 +18,9 @@ describe('Document Management', () => {
     
     // 0. Toggle App Mode to EDIT to see "New Document" button
     // The button is inside a v-btn-toggle
-    cy.contains('button', 'Edit').click({ force: true });
+    // We need to click "Edit" on the toggle. 
+    // Assuming the toggle value is 'EDIT'.
+    cy.get('[data-test="mode-edit"]').click({ force: true });
     
     // 1. Create New Document
     cy.contains('New Document').should('be.visible'); // Wait for visibility
@@ -55,10 +57,18 @@ describe('Document Management', () => {
     // "Close" the document by clicking Back button
     cy.get('[data-test="back-button"]').click();
     
+    // This likely goes to DocumentDetailView first
+    // Verify we are in detail view (check for title or unique content)
+    cy.contains(testTitle).should('be.visible');
+    
+    // Go back again to reach list
+    cy.get('[data-test="back-button"]').click();
+    
     // Intercept fetch
     cy.intercept('GET', '/api/documents*').as('getDocuments');
 
     // Reload the page to ensure we are fetching fresh data from Backend (Verification of Persistence)
+    // Note: Reloading at Home View
     cy.reload();
     
     // Wait for the fetch to complete and verify it was successful
@@ -87,6 +97,9 @@ describe('Document Management', () => {
     
     // Wait for initial fetch to complete (Loading indicator should disappear)
     cy.contains('Loading...').should('not.exist');
+    
+    // We must switch to EDIT mode to see DRAFT documents (default is DRAFT)
+    cy.get('[data-test="mode-edit"]').click();
     
     // Verify presence in full list (without search filter first)
     // This isolates whether the data is present vs search filter issue
@@ -129,7 +142,7 @@ describe('Document Management', () => {
     // Toolbar: `v-btn-toggle v-model="appMode"`.
     // We need to click "Edit" on the toggle.
     
-    cy.get('button[value="EDIT"]').click(); // Improved Selector
+    cy.get('[data-test="edit-document-button"]').click(); // Improved Selector
     
     // Now verify attachment
     cy.contains('Attachments').click(); // Expand panel if it's an expansion panel

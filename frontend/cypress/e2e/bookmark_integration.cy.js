@@ -24,7 +24,11 @@ describe('Bookmark Integration Test', () => {
     it('should successfully load a document directly via URL (Simulating Bookmark)', () => {
         // 1. Get the current URL (which is the document URL)
         cy.url().then((url) => {
-            const docUrl = url;
+            let docUrl = url;
+            // Handle if URL ends with /edit (due to no redirect on save)
+            if (docUrl.endsWith('/edit')) {
+                docUrl = docUrl.substring(0, docUrl.length - 5);
+            }
             cy.log('Bookmark URL:', docUrl);
             expect(docUrl).to.include('/documents/');
 

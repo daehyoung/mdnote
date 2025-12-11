@@ -5,7 +5,7 @@ describe('API Verification & Cleanup', () => {
         // Login to get token
         cy.request('POST', '/api/v1/auth/login', {
             username: 'admin',
-            password: 'password'
+            password: 'admin'
         }).then((response) => {
             expect(response.status).to.eq(200);
             token = response.body.token;

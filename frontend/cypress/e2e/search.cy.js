@@ -15,7 +15,7 @@ describe('Search Functionality', () => {
     const uniqueTitle = 'Searchable Doc ' + Date.now();
     
     // Create doc
-    cy.contains('button', 'Edit').click({ force: true });
+    cy.get('[data-test="mode-edit"]').click({ force: true });
     cy.contains('New Document').click();
     cy.get('#title-input').clear().type(uniqueTitle);
     cy.contains('Save').click();
@@ -25,6 +25,9 @@ describe('Search Functionality', () => {
     // We must go to root to see the list and search bar
     cy.visit('/');
     cy.contains('Documents').should('be.visible');
+    
+    // Switch to Edit Mode to see DRAFT documents
+    cy.get('[data-test="mode-edit"]').click({ force: true });
     
     // Type in search bar and hit Enter
     cy.get('#search-input').type(uniqueTitle + '{enter}');

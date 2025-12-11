@@ -31,6 +31,7 @@
                         @click="goToEdit"
                         prepend-icon="mdi-pencil"
                         variant="tonal"
+                        data-test="edit-document-button"
                     >
                         Edit
                     </v-btn>
@@ -44,6 +45,7 @@
                             class="pa-4 flex-grow-1 markdown-body"
                             v-html="compiledViewMarkdown"
                             style="min-height: 500px;"
+                            :data-theme="markdownTheme"
                         ></div>
                     </div>
     
@@ -128,21 +130,39 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import { useAuthStore } from '../stores/auth';
 import { useDocumentStore } from '../stores/document';
 import { useRouter, useRoute } from 'vue-router';
-import { marked } from 'marked';
+import { marked, mermaid } from '../utils/markdown';
+import { useTheme } from 'vuetify';
 
 const authStore = useAuthStore();
 const documentStore = useDocumentStore();
 const router = useRouter();
 const route = useRoute();
+const theme = useTheme();
+
+const markdownTheme = computed(() => {
+    return theme.global.current.value.dark ? 'dark' : 'light';
+});
 
 const newComment = ref('');
 
 const compiledViewMarkdown = computed(() => {
     return marked(documentStore.currentDocument?.content || '');
+});
+
+// Watch for changes and render mermaid
+watch(compiledViewMarkdown, async () => {
+    await nextTick();
+    try {
+        await mermaid.run({
+            nodes: document.querySelectorAll('.mermaid')
+        });
+    } catch (e) {
+        console.error('Mermaid render error:', e);
+    }
 });
 
 const canEdit = computed(() => {

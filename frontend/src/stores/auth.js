@@ -20,7 +20,10 @@ export const useAuthStore = defineStore('auth', {
         this.theme = response.data.theme || 'light';
         localStorage.setItem('token', this.token);
         localStorage.setItem('theme', this.theme);
-        // this.user = ... fetch user info
+        
+        // Fetch full profile to populate user state (roles, etc.)
+        await this.fetchProfile();
+        
         return true;
       } catch (error) {
         console.error('Login failed', error);
