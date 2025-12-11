@@ -21,7 +21,13 @@ const router = createRouter({
         {
           path: 'documents/:id',
           name: 'document-detail',
-          component: () => import('../views/HomeView.vue')
+          component: () => import('../views/DocumentDetailView.vue')
+        },
+        {
+          path: 'documents/:id/edit',
+          name: 'document-edit',
+          component: () => import('../views/DocumentEditView.vue'),
+          meta: { requiresEditPermission: true }
         },
         {
           path: 'search',
@@ -60,13 +66,12 @@ const router = createRouter({
 })
 
 import { useAuthStore } from '../stores/auth';
+import { useDocumentStore } from '../stores/document';
 
 // Navigation Guard
 router.beforeEach(async (to, from, next) => {
   const isAuthenticated = localStorage.getItem('token');
-  const authStore = useAuthStore(); // Check if this works outside component setup. Pinia usually allows it if app is created.
-  // Note: Pinia instance is needed. Usually router is used app.use(router) after app.use(pinia).
-  // Safest way is to access store inside guard if pinia is installed.
+  const authStore = useAuthStore(); 
   
   if (to.meta.requiresAuth && !isAuthenticated) {
     next('/login');
@@ -79,10 +84,6 @@ router.beforeEach(async (to, from, next) => {
               await authStore.fetchProfile();
           } catch (e) {
               console.error("Failed to fetch profile in guard", e);
-              // If fetch fails, maybe token is invalid? 
-              // Let's allow redirect to login or home?
-              // If we can't get profile, we can't verify admin.
-              // Safer to redirect to home or login.
               next('/login');
               return;
           }
@@ -90,6 +91,58 @@ router.beforeEach(async (to, from, next) => {
       
       if (authStore.user && authStore.user.role !== 'ADMIN') {
           next('/');
+          return;
+      }
+  }
+
+  // Edit Permission Guard
+  if (to.matched.some(record => record.meta.requiresEditPermission)) {
+      const docId = to.params.id;
+      const documentStore = useDocumentStore();
+      
+      // Use existing currentDocument if it matches ID, otherwise fetch
+      let doc = documentStore.currentDocument;
+      if (!doc || doc.id !== docId) {
+          try {
+              // Note: fetchDocument returns the document object
+              doc = await documentStore.fetchDocument(docId);
+          } catch (e) {
+              console.error("Failed to fetch doc for permission check", e);
+              next('/'); 
+              return;
+          }
+      }
+      
+      if (!doc) {
+          next('/'); // Doc not found
+          return;
+      }
+      
+      // Ensure user profile is loaded for check
+      if (!authStore.user && isAuthenticated) {
+         try {
+             await authStore.fetchProfile();
+         } catch(e) { /* ignore */ }
+      }
+
+      const user = authStore.user;
+      let canEdit = false;
+      if (user) {
+          if (user.role === 'ADMIN') {
+              canEdit = true;
+          } else if (doc.author && doc.author.username === user.username) {
+              canEdit = true;
+          } else if (doc.groupWrite && user.department && doc.author.department && user.department.id === doc.author.department.id) {
+              canEdit = true;
+          } else if (doc.publicWrite) {
+              canEdit = true;
+          }
+      }
+      
+      if (!canEdit) {
+          console.warn("User attempted to access edit route without permission.");
+          // Redirect to view mode
+          next({ name: 'document-detail', params: { id: docId } });
           return;
       }
   }

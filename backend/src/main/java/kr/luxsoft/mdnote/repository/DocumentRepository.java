@@ -16,29 +16,29 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     
     // Consolidated Search with Permissions
     @Query("SELECT DISTINCT d FROM Document d LEFT JOIN d.tags t WHERE " +
-           "(:categoryId IS NULL OR d.category.id = :categoryId) AND " +
-           "(:status IS NULL OR d.status = :status) AND " +
-           "(:query IS NULL OR LOWER(d.title) LIKE LOWER(CONCAT('%', CAST(:query AS string), '%')) OR LOWER(t.name) LIKE LOWER(CONCAT('%', CAST(:query AS string), '%'))) AND " +
-           "(" +
-           " :isAdmin = true OR " +
-           " d.author.username = :username OR " +
-           " (d.publicRead = true) OR " +
-           " (d.groupRead = true AND d.author.department.id = :deptId)" +
-           ")")
-    Page<Document> findAllWithPermissions(
+            "(:categoryId IS NULL OR d.category.id = :categoryId) AND " +
+            "(:status IS NULL OR d.status = :status) AND " +
+            "(:query IS NULL OR :query = '' OR LOWER(d.title) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%'))) AND " +
+            "(" +
+            " :isAdmin = true OR " +
+            " d.author.username = :username OR " +
+            " (d.publicRead = true) OR " +
+            " (d.groupRead = true AND d.author.department.id = :deptId)" +
+            ")")
+     Page<Document> findAllWithPermissions(
             @Param("categoryId") Long categoryId, 
             @Param("status") String status, 
             @Param("query") String query,
             @Param("username") String username,
             @Param("deptId") Long deptId,
-            @Param("isAdmin") boolean isAdmin, // Kept for interface compatibility or remove? Let's keep signature to avoid break, but ignore logic if used elsewhere. actually usage is only inside service. 
+            @Param("isAdmin") boolean isAdmin,
             Pageable pageable);
 
     @Query("SELECT DISTINCT d FROM Document d LEFT JOIN d.tags t WHERE " +
-           "(:categoryId IS NULL OR d.category.id = :categoryId) AND " +
-           "(:status IS NULL OR d.status = :status) AND " +
-           "(:query IS NULL OR LOWER(d.title) LIKE LOWER(CONCAT('%', CAST(:query AS string), '%')) OR LOWER(t.name) LIKE LOWER(CONCAT('%', CAST(:query AS string), '%')))")
-    Page<Document> findAllAdmin(
+            "(:categoryId IS NULL OR d.category.id = :categoryId) AND " +
+            "(:status IS NULL OR d.status = :status) AND " +
+            "(:query IS NULL OR :query = '' OR LOWER(d.title) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%')))")
+     Page<Document> findAllAdmin(
             @Param("categoryId") Long categoryId, 
             @Param("status") String status, 
             @Param("query") String query,

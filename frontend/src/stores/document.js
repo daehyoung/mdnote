@@ -17,6 +17,7 @@ export const useDocumentStore = defineStore('document', {
     totalElements: 0,
     filterStatus: null, // For status filtering
     selectedCategoryId: null, // For category filtering
+    searchQuery: '', // Add search query state
   }),
   actions: {
     async fetchDocuments(categoryId = null) {
@@ -40,6 +41,13 @@ export const useDocumentStore = defineStore('document', {
         // Handle Status Filter
         if (this.filterStatus) {
             params.append('status', this.filterStatus);
+        } else if (this.appMode === 'VIEW') {
+            params.append('status', 'PUBLISHED');
+        }
+
+        // Handle Search Query
+        if (this.searchQuery) {
+            params.append('query', this.searchQuery);
         }
 
         const response = await api.get(`/documents?${params.toString()}`);
@@ -219,17 +227,13 @@ export const useDocumentStore = defineStore('document', {
     setPage(page) {
         this.page = page;
     },
+    setSearchQuery(query) {
+        this.searchQuery = query;
+        this.page = 1; // Reset to first page on new search
+    },
     async searchDocuments(query) {
-        this.loading = true;
-        try {
-            const response = await api.get(`/search?q=${query}`);
-            this.documents = response.data;
-        } catch (error) {
-            this.error = 'Failed to search documents';
-            console.error(error);
-        } finally {
-            this.loading = false;
-        }
+        this.setSearchQuery(query);
+        await this.fetchDocuments();
     }
   },
 });

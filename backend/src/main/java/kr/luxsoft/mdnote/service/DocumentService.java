@@ -79,6 +79,7 @@ public class DocumentService {
                 document.setGroupWrite(documentDetails.isGroupWrite());
                 document.setPublicRead(documentDetails.isPublicRead());
                 document.setPublicWrite(documentDetails.isPublicWrite());
+                document.setAllowComments(documentDetails.isAllowComments());
             }
             
             // Tags

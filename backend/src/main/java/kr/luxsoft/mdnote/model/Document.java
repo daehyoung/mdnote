@@ -62,6 +62,9 @@ public class Document {
     @Column(columnDefinition = "boolean default false")
     private boolean publicWrite = false;
 
+    @Column(columnDefinition = "boolean default true")
+    private boolean allowComments = true;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
