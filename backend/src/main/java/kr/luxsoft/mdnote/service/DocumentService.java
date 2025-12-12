@@ -29,8 +29,9 @@ public class DocumentService {
     @Autowired
     private UserRepository userRepository;
 
-    public Page<Document> getAllDocuments(Long categoryId, String status, String query, Pageable pageable, String username) {
+    public Page<Document> getAllDocuments(Long categoryId, String status, String tagName, String query, Pageable pageable, String username) {
         kr.luxsoft.mdnote.model.User currentUser = null;
+        log.info("DEBUG: DocumentService.getAllDocuments inputs - categoryId: {}, status: {}, tagName: {}, query: {}, username: {}", categoryId, status, tagName, query, username);
         if (username != null) {
             currentUser = userRepository.findByUsername(username).orElse(null);
         }
@@ -38,13 +39,13 @@ public class DocumentService {
         boolean isAdmin = (currentUser != null) && "ADMIN".equals(currentUser.getRole());
         
         if (isAdmin) {
-            return documentRepository.findAllAdmin(categoryId, status, query, pageable);
+            return documentRepository.findAllAdmin(categoryId, status, tagName, query, pageable);
         }
 
         Long deptId = (currentUser != null && currentUser.getDepartment() != null) ? currentUser.getDepartment().getId() : -1L;
         String searchUsername = (username != null) ? username : "ANONYMOUS_GUEST";
 
-        return documentRepository.findAllWithPermissions(categoryId, status, query, searchUsername, deptId, false, pageable);
+        return documentRepository.findAllWithPermissions(categoryId, status, tagName, query, searchUsername, deptId, false, pageable);
     }
 
     public Optional<Document> getDocumentById(Long id) {

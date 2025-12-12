@@ -21,6 +21,7 @@ public class DocumentController {
     public Page<Document> getAllDocuments(
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String status,
+            @RequestParam(required = false) String tagName, // Added tagName
             @RequestParam(required = false) String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -45,7 +46,9 @@ public class DocumentController {
         
         Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by(direction, sortField));
         String callbackUsername = (principal != null) ? principal.getName() : null;
-        return documentService.getAllDocuments(categoryId, status, query, pageable, callbackUsername);
+        System.out.println("DEBUG: DocumentController.getAllDocuments called");
+        System.out.println("DEBUG params: categoryId=" + categoryId + ", status=" + status + ", tagName=" + tagName + ", query=" + query);
+        return documentService.getAllDocuments(categoryId, status, tagName, query, pageable, callbackUsername);
     }
 
     @GetMapping("/{id}")

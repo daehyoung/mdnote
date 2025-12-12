@@ -66,7 +66,7 @@ public class PermissionsIntegrationTest {
 
         // 4. Search as Admin
         Page<Document> result = documentService.getAllDocuments(
-                null, null, null, PageRequest.of(0, 10), "admin1"
+                null, null, null, null, PageRequest.of(0, 10), "user1"
         );
 
         // 5. Verify
@@ -100,10 +100,45 @@ public class PermissionsIntegrationTest {
 
         // 4. Search as Stranger
         Page<Document> result = documentService.getAllDocuments(
-                null, null, null, PageRequest.of(0, 10), "user2"
+                null, null, null, null, PageRequest.of(0, 10), "user2"
         );
 
         // 5. Verify
         assertThat(result.getContent()).isEmpty();
+    }
+    @Test
+    public void shouldFindDocumentsByTag() {
+        // 1. Create User
+        User user = new User();
+        user.setUsername("taguser");
+        user.setPasswordHash("pass");
+        user.setRole("USER"); 
+        userRepository.save(user);
+
+        // 2. Create Doc with Tag using Service
+        Document doc = new Document();
+        doc.setTitle("Tagged Doc");
+        doc.setPublicRead(true);
+        
+        java.util.Set<kr.luxsoft.mdnote.model.Tag> tags = new java.util.HashSet<>();
+        tags.add(new kr.luxsoft.mdnote.model.Tag("test-tag"));
+        doc.setTags(tags);
+        
+        documentService.createDocument(doc, "taguser");
+
+        // 3. Search by Tag
+        Page<Document> result = documentService.getAllDocuments(
+                null, null, "test-tag", null, PageRequest.of(0, 10), "taguser"
+        );
+
+        // 4. Verify Matches
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getTitle()).isEqualTo("Tagged Doc");
+        
+        // 5. Search by Non-existent Tag
+        Page<Document> resultEmpty = documentService.getAllDocuments(
+                null, null, "other-tag", null, PageRequest.of(0, 10), "taguser"
+        );
+        assertThat(resultEmpty.getContent()).isEmpty();
     }
 }

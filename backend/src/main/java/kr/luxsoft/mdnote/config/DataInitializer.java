@@ -31,22 +31,16 @@ public class DataInitializer implements CommandLineRunner {
 
     private void createCategories() {
         if (categoryRepository.count() == 0) {
-            kr.luxsoft.mdnote.model.Category engineering = new kr.luxsoft.mdnote.model.Category();
-            engineering.setName("Engineering");
-            categoryRepository.save(engineering);
+            kr.luxsoft.mdnote.model.Category docs = new kr.luxsoft.mdnote.model.Category();
+            docs.setName("Document");
+            categoryRepository.save(docs);
             
-            kr.luxsoft.mdnote.model.Category backend = new kr.luxsoft.mdnote.model.Category();
-            backend.setName("Backend");
-            backend.setParent(engineering);
-            categoryRepository.save(backend);
-            
-            kr.luxsoft.mdnote.model.Category frontend = new kr.luxsoft.mdnote.model.Category();
-            frontend.setName("Frontend");
-            frontend.setParent(engineering);
-            categoryRepository.save(frontend);
+            kr.luxsoft.mdnote.model.Category reports = new kr.luxsoft.mdnote.model.Category();
+            reports.setName("Report"); 
+            categoryRepository.save(reports);
             
             kr.luxsoft.mdnote.model.Category hr = new kr.luxsoft.mdnote.model.Category();
-            hr.setName("Human Resources");
+            hr.setName("Resources");
             categoryRepository.save(hr);
             
             log.debug("Seeded categories");

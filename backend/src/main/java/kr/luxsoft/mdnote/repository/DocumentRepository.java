@@ -18,6 +18,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query("SELECT d FROM Document d WHERE " +
             "(:categoryId IS NULL OR d.category.id = :categoryId) AND " +
             "(:status IS NULL OR d.status = :status) AND " +
+            "(:tagName IS NULL OR EXISTS (SELECT t2 FROM d.tags t2 WHERE t2.name = :tagName)) AND " +
             "(:query IS NULL OR :query = '' OR LOWER(d.title) LIKE LOWER(CONCAT('%', :query, '%')) OR EXISTS (SELECT t FROM d.tags t WHERE LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%')))) AND " +
             "(" +
             " :isAdmin = true OR " +
@@ -28,6 +29,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
      Page<Document> findAllWithPermissions(
             @Param("categoryId") Long categoryId, 
             @Param("status") String status, 
+            @Param("tagName") String tagName,
             @Param("query") String query,
             @Param("username") String username,
             @Param("deptId") Long deptId,
@@ -37,10 +39,12 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query("SELECT d FROM Document d WHERE " +
             "(:categoryId IS NULL OR d.category.id = :categoryId) AND " +
             "(:status IS NULL OR d.status = :status) AND " +
+            "(:tagName IS NULL OR EXISTS (SELECT t2 FROM d.tags t2 WHERE t2.name = :tagName)) AND " +
             "(:query IS NULL OR :query = '' OR LOWER(d.title) LIKE LOWER(CONCAT('%', :query, '%')) OR EXISTS (SELECT t FROM d.tags t WHERE LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%'))))")
      Page<Document> findAllAdmin(
             @Param("categoryId") Long categoryId, 
             @Param("status") String status, 
+            @Param("tagName") String tagName,
             @Param("query") String query,
             Pageable pageable);
 

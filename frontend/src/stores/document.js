@@ -9,6 +9,7 @@ export const useDocumentStore = defineStore('document', {
     categories: [], // Deprecated or Combined? Let's use separate states
     systemCategories: [],
     userCategories: [],
+    tags: [], // Available tags
     loading: false,
     error: null,
     appMode: 'VIEW', // Added shared state for UI Mode
@@ -19,6 +20,9 @@ export const useDocumentStore = defineStore('document', {
     totalElements: 0,
     filterStatus: null, // For status filtering
     selectedCategoryId: null, // For category filtering
+    selectedTag: null, // Currently selected tag for filter
+    statusFilter: null, // "DRAFT", "PUBLISHED", etc.
+    searchQuery: '',
     // Sorting State
     sortOrder: 'updatedAt,desc',
   }),
@@ -29,17 +33,24 @@ export const useDocumentStore = defineStore('document', {
       try {
         // Construct query params
         const params = new URLSearchParams();
+        
         // Handle Category
         // Note: categoryId argument overrides state if provided (for consistent valid usage)
         // Check if we are "All Categories" (null) or specific
         const targetCatId = categoryId !== undefined ? categoryId : this.selectedCategoryId;
-        if (targetCatId) {
-            params.append('categoryId', targetCatId);
-        }
+        const tag = this.selectedTag;
         
         // Handle Pagination (Backend matches 0-based, Vuetify is 1-based)
         params.append('page', this.page - 1); 
         params.append('size', this.size);
+        
+        if (targetCatId) {
+            params.append('categoryId', targetCatId);
+        }
+        
+        if (tag) {
+            params.append('tagName', tag);
+        }
         
         // Handle Status Filter
         if (this.filterStatus) {
@@ -146,6 +157,19 @@ export const useDocumentStore = defineStore('document', {
             console.error("Failed to fetch categories", error);
         }
     },
+    async fetchTags() {
+      try {
+        const params = new URLSearchParams();
+        if (this.appMode === 'VIEW') {
+            params.append('status', 'PUBLISHED');
+        }
+        const response = await api.get(`/tags?${params.toString()}`); 
+        this.tags = response.data;
+      } catch (error) {
+        console.error('Failed to fetch tags', error);
+      }
+    },
+
     async createCategory(name, parentId, scope = 'SYSTEM') {
         try {
             await api.post('/categories', { name, parentId, scope });
@@ -227,10 +251,17 @@ export const useDocumentStore = defineStore('document', {
         this.appMode = mode;
         // Refresh list to apply new mode-based filters (e.g., show DRAFTs in EDIT mode)
         await this.fetchDocuments();
+        await this.fetchTags(); // Refresh tags to update counts based on mode
     },
     setSelectedCategoryId(id) {
         this.selectedCategoryId = id;
+        this.selectedTag = null; // Clear tag when category selected
         this.page = 1; // Reset to first page when category changes
+    },
+    setSelectedTag(tagName) {
+        this.selectedTag = tagName;
+        this.selectedCategoryId = null; // Clear category when tag selected
+        this.page = 1; // Reset to first page
     },
     setFilterStatus(status) {
         this.filterStatus = status;

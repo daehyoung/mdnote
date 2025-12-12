@@ -41,7 +41,7 @@
               prepend-icon="mdi-folder-outline"
               title="All Documents"
               @click="filterByCategory(null)"
-              :active="!documentStore.selectedCategoryId"
+              :active="!documentStore.selectedCategoryId && !documentStore.selectedTag"
               color="primary"
           ></v-list-item>
            <RecursiveList 
@@ -77,6 +77,24 @@
               No personal folders yet.
            </v-list-item>
       </v-list>
+
+       <v-divider class="my-2"></v-divider>
+
+       <!-- Tags -->
+       <v-list-subheader>Tags</v-list-subheader>
+       <v-chip-group column class="px-3" v-model="selectedTagIndex" @update:model-value="onTagSelected">
+           <v-chip
+             v-for="tag in documentStore.tags"
+             :key="tag.name"
+             :value="tag.name"
+             filter
+             variant="outlined"
+             size="small"
+             :class="{'bg-primary text-white': documentStore.selectedTag === tag.name}"
+           >
+             {{ tag.name }} ({{ tag.count }})
+           </v-chip>
+       </v-chip-group>
     </v-navigation-drawer>
     
     <v-main class="d-flex align-center justify-center" style="min-height: 300px;">
@@ -149,12 +167,29 @@ const filterByCategory = async (category) => {
     await documentStore.fetchDocuments(catId);
 };
 
+const selectedTagIndex = ref(null); // Local ref for chip group, but sync with store
+
+const onTagSelected = async (tag) => { 
+    console.log("MainLayout: onTagSelected called with:", tag);
+    if (tag) {
+        documentStore.setSelectedTag(tag);
+    } else {
+        documentStore.setSelectedTag(null);
+    }
+    
+    documentStore.currentDocument = null;
+    router.push({ name: 'home' });
+    console.log("MainLayout: Fetching documents after tag selection. Tag:", documentStore.selectedTag, "Category:", documentStore.selectedCategoryId);
+    await documentStore.fetchDocuments(); 
+};
+
 
 
     
 onMounted(async () => {
     // Initial fetch of categories for the sidebar
     documentStore.fetchCategories();
+    documentStore.fetchTags(); // Fetch tags
     // Ensure profile is loaded for UI logic (like Admin toggle)
     if (authStore.isAuthenticated && !authStore.user) {
         await authStore.fetchProfile();
