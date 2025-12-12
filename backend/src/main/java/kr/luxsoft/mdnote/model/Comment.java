@@ -27,6 +27,7 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"email", "role", "status", "theme", "createdAt", "password", "passwordHash", "department"})
     private User user;
 
     @Column(name = "created_at")

@@ -30,6 +30,7 @@ public class Document {
 
     @ManyToOne
     @JoinColumn(name = "author_id")
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"email", "role", "status", "theme", "createdAt", "password", "passwordHash"})
     private User author;
 
     private String status; // DRAFT, PUBLISHED, etc.

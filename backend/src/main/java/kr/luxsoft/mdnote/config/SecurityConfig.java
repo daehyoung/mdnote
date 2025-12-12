@@ -28,6 +28,9 @@ public class SecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/api/admin/**")).hasRole("ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/**").authenticated()
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/**").authenticated()
+                .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/**").authenticated()
                 .anyRequest().permitAll() 
             );
 

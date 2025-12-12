@@ -30,18 +30,21 @@ public class DocumentService {
     private UserRepository userRepository;
 
     public Page<Document> getAllDocuments(Long categoryId, String status, String query, Pageable pageable, String username) {
-        kr.luxsoft.mdnote.model.User currentUser = userRepository.findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+        kr.luxsoft.mdnote.model.User currentUser = null;
+        if (username != null) {
+            currentUser = userRepository.findByUsername(username).orElse(null);
+        }
             
-        boolean isAdmin = "ADMIN".equals(currentUser.getRole());
+        boolean isAdmin = (currentUser != null) && "ADMIN".equals(currentUser.getRole());
         
         if (isAdmin) {
             return documentRepository.findAllAdmin(categoryId, status, query, pageable);
         }
 
-        Long deptId = (currentUser.getDepartment() != null) ? currentUser.getDepartment().getId() : -1L;
+        Long deptId = (currentUser != null && currentUser.getDepartment() != null) ? currentUser.getDepartment().getId() : -1L;
+        String searchUsername = (username != null) ? username : "ANONYMOUS_GUEST";
 
-        return documentRepository.findAllWithPermissions(categoryId, status, query, username, deptId, false, pageable);
+        return documentRepository.findAllWithPermissions(categoryId, status, query, searchUsername, deptId, false, pageable);
     }
 
     public Optional<Document> getDocumentById(Long id) {

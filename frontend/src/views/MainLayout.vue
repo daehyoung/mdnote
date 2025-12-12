@@ -1,6 +1,6 @@
 <template>
   <v-layout class="rounded rounded-md">
-    <v-app-bar :elevation="2">
+    <v-app-bar :elevation="2" density="compact" scroll-behavior="hide">
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>MD Note</v-toolbar-title>
       
@@ -34,9 +34,6 @@
     </v-app-bar>
   
     <v-navigation-drawer v-model="drawer" width="300" v-if="!isAdminRoute">
-      <div class="pa-2">
-      </div>
-      <v-divider></v-divider>
       <v-list-subheader>Categories</v-list-subheader>
       <v-list density="compact" nav class="sidebar-list">
           <v-list-item

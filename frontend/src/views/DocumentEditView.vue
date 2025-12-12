@@ -1,10 +1,10 @@
 <template>
-    <v-container fluid class="fill-height pa-0 ma-0" style="width: 100%; max-width: 100%;">
-      <v-row no-gutters class="fill-height">
-        <v-col cols="12" class="d-flex flex-column fill-height pa-0 ma-0">
-            <div class="d-flex flex-column fill-height">
+    <v-container fluid class="pa-0 ma-0" style="width: 100%; max-width: 100%;">
+      <v-row no-gutters>
+        <v-col cols="12" class="d-flex flex-column pa-0 ma-0">
+            <div class="d-flex flex-column">
                  <!-- Header -->
-                  <v-toolbar dense flat class="border-b">
+                  <v-toolbar density="compact" flat class="border-b" style="position: sticky; top: 0; z-index: 100;">
                        <v-btn icon @click="goBack" data-test="back-button">
                          <v-icon>mdi-arrow-left</v-icon>
                      </v-btn>
@@ -32,13 +32,13 @@
                     <v-btn icon @click="triggerFileUpload" title="Upload Attachment">
                         <v-icon>mdi-paperclip</v-icon>
                     </v-btn>
-                    <v-btn @click="togglePreview" class="ml-2">
-                        {{ showPreview ? 'Edit' : 'Preview' }}
+                    <v-btn @click="toggleViewMode" class="ml-2">
+                        {{ viewModeLabel }}
                     </v-btn>
-                 </v-toolbar>
+                </v-toolbar>
 
                 <!-- EDIT MODE Metadata -->
-                <div class="d-flex align-center pa-1 border-b">
+                <div class="d-flex align-center py-1 px-2 border-b">
                     <v-autocomplete
                         v-model="editedCategoryId"
                         :items="flattenedCategories"
@@ -47,8 +47,8 @@
                         label="Category"
                         density="compact"
                         hide-details
-                        class="mr-4"
-                        style="max-width: 200px;"
+                        class="mr-2"
+                        style="flex: 2; min-width: 150px;"
                         clearable
                         placeholder="Select Category"
                     ></v-autocomplete>
@@ -62,8 +62,8 @@
                         hide-details
                         placeholder="Add tags..."
                         :items="[]" 
-                        class="mr-4"
-                        style="max-width: 400px;"
+                        class="mr-2"
+                        style="flex: 3; min-width: 200px;"
                     ></v-combobox>
 
                     <v-select
@@ -72,80 +72,107 @@
                         label="Status"
                         density="compact"
                         hide-details
-                        style="max-width: 150px;"
+                        style="flex: 1; min-width: 120px;"
                         id="status-selector"
+                        class="mr-2"
                     ></v-select>
+
+                    <!-- Settings Toggle Summary -->
+                    <v-text-field
+                        :model-value="settingsSummary"
+                        label="Info"
+                        readonly
+                        density="compact"
+                        hide-details
+                        variant="filled"
+                        :append-inner-icon="showSettings ? 'mdi-chevron-right' : 'mdi-chevron-left'"
+                        @click="showSettings = !showSettings"
+                        class="cursor-pointer"
+                        style="flex: 1; min-width: 180px; max-width: 300px;" 
+                    ></v-text-field>
                 </div>
 
-                <!-- Content Area -->
-                <div class="d-flex flex-grow-1 flex-column" style="height: calc(100vh - 180px); overflow-y: auto;">
-                    <div class="d-flex flex-grow-1">
-                        <!-- Editor -->
-                        <div v-show="!showPreview" class="flex-grow-1 d-flex">
-                            <textarea
-                                v-model="editedContent"
-                                class="pa-4 flex-grow-1 text-high-emphasis bg-transparent"
-                                style="width: 100%; min-height: 500px; border: none; outline: none; resize: none; font-family: monospace;"
-                                placeholder="Type your markdown here..."
-                                id="content-editor"
+                <!-- Editor/Preview Area -->
+                <div class="d-flex flex-grow-1">
+                    <!-- Editor -->
+                    <div class="d-flex flex-column" v-if="viewMode === 'EDIT' || viewMode === 'SPLIT'" :class="viewMode === 'SPLIT' ? 'w-50 border-r' : 'w-100'">
+                        <div class="flex-grow-1" style="min-height: 500px;">
+                            <textarea 
+                                v-model="editedContent" 
+                                class="pa-4" 
+                                style="width: 100%; height: 100%; min-height: 500px; resize: none; border: none; outline: none; font-family: monospace; font-size: 14px; background-color: transparent; color: inherit;"
+                                placeholder="# Write markdown here..."
+                                @input="handleInput"
                             ></textarea>
                         </div>
-                        
+                    </div>
                         <!-- Preview -->
                         <div 
-                            v-show="showPreview" 
+                            v-if="viewMode === 'PREVIEW' || viewMode === 'SPLIT'" 
                             class="pa-4 flex-grow-1 markdown-body"
+                            :class="viewMode === 'SPLIT' ? 'w-50' : 'w-100'"
                             v-html="compiledMarkdown"
                             style="min-height: 500px;"
                             :data-theme="markdownTheme"
                             :key="markdownTheme"
                         ></div>
-                    </div>
+                    
     
-                    <!-- Metadata and Comments Panel -->
-                    <div class="pa-4">
-                        <v-expansion-panels multiple v-model="openSidebarGroups">
+                <!-- Sidebar Drawer -->
+                <v-navigation-drawer
+                    v-model="showSettings"
+                    location="right"
+                    width="350"
+                    disable-resize-watcher
+                    border="s"
+                >
+                    <div class="pa-2">
+                        <div class="d-flex align-center justify-space-between mb-2">
+                            <div class="text-subtitle-1 font-weight-bold">Settings</div>
+                            <v-btn icon="mdi-close" variant="text" size="x-small" @click="showSettings = false"></v-btn>
+                        </div>
+                        <v-expansion-panels multiple v-model="openSidebarGroups" density="compact" variant="accordion">
                             <v-expansion-panel value="attachments" title="Attachments">
-                                 <v-expansion-panel-text>
-                                    <v-list dense class="bg-transparent">
-                                        <v-list-item v-for="att in documentStore.currentDocument?.attachments" :key="att.id" :title="att.originalFileName || att.fileName">
+                                 <v-expansion-panel-text class="pa-0">
+                                    <v-list density="compact" class="bg-transparent pa-0">
+                                        <v-list-item v-for="att in documentStore.currentDocument?.attachments" :key="att.id" :title="att.originalFileName || att.fileName" class="min-h-0 py-0">
                                             <template v-slot:subtitle>
-                                                {{ (att.fileSize / 1024).toFixed(2) }} KB
+                                                <span class="text-caption">{{ (att.fileSize / 1024).toFixed(2) }} KB</span>
                                             </template>
                                             <template v-slot:append>
-                                                <v-btn icon size="small" variant="text" :href="`/api/attachments/${att.id}`" target="_blank" class="mr-1">
-                                                    <v-icon>mdi-download</v-icon>
+                                                <v-btn icon size="x-small" variant="text" :href="`/api/attachments/${att.id}`" target="_blank" class="mr-1">
+                                                    <v-icon size="small">mdi-download</v-icon>
                                                 </v-btn>
-                                                <v-btn icon size="small" variant="text" color="error" @click="removeAttachment(att.id)">
-                                                    <v-icon>mdi-delete</v-icon>
+                                                <v-btn icon size="x-small" variant="text" color="error" @click="removeAttachment(att.id)">
+                                                    <v-icon size="small">mdi-delete</v-icon>
                                                 </v-btn>
                                             </template>
                                         </v-list-item>
-                                        <v-list-item v-if="!documentStore.currentDocument?.attachments?.length">
-                                            <v-list-item-subtitle>No attachments</v-list-item-subtitle>
+                                        <v-list-item v-if="!documentStore.currentDocument?.attachments?.length" density="compact" class="min-h-0 py-1">
+                                            <v-list-item-subtitle class="text-caption">No attachments</v-list-item-subtitle>
                                         </v-list-item>
                                     </v-list>
                                  </v-expansion-panel-text>
                             </v-expansion-panel>
                             
                             <v-expansion-panel value="permissions" title="Permissions">
-                                <v-expansion-panel-text>
-                                    <v-row no-gutters>
-                                        <v-col cols="12">
-                                            <div class="text-subtitle-2 mb-2">Group (Department)</div>
-                                            <v-checkbox v-model="editedGroupRead" label="Read" density="compact" hide-details></v-checkbox>
-                                            <v-checkbox v-model="editedGroupWrite" label="Write" density="compact" hide-detailsMessages="Write permission includes delete"></v-checkbox>
+                                <v-expansion-panel-text class="pa-0">
+                                    <v-row no-gutters class="pa-0">
+                                        <v-col cols="12" class="mb-1">
+                                            <div class="text-caption font-weight-bold mb-0">Group (Department)</div>
+                                            <v-checkbox v-model="editedGroupRead" label="Read" density="compact" hide-details class="ma-0 pa-0" style="min-height: 24px;"></v-checkbox>
+                                            <v-checkbox v-model="editedGroupWrite" label="Write" density="compact" hide-detailsMessages="Write permission includes delete" class="ma-0 pa-0" style="min-height: 24px;"></v-checkbox>
                                         </v-col>
-                                        <v-col cols="12" class="mt-2">
-                                            <v-divider></v-divider>
-                                            <div class="text-subtitle-2 mt-2 mb-2">General Public</div>
-                                            <v-checkbox v-model="editedPublicRead" label="Read" density="compact" hide-details></v-checkbox>
-                                            <v-checkbox v-model="editedPublicWrite" label="Write" density="compact" hide-detailsMessages="Write permission includes delete"></v-checkbox>
+                                        <v-col cols="12" class="mt-1 mb-1">
+                                            <v-divider class="my-1"></v-divider>
+                                            <div class="text-caption font-weight-bold mb-0">General Public</div>
+                                            <v-checkbox v-model="editedPublicRead" label="Read" density="compact" hide-details class="ma-0 pa-0" style="min-height: 24px;"></v-checkbox>
+                                            <v-checkbox v-model="editedPublicWrite" label="Write" density="compact" hide-detailsMessages="Write permission includes delete" class="ma-0 pa-0" style="min-height: 24px;"></v-checkbox>
                                         </v-col>
-                                        <v-col cols="12" class="mt-2">
-                                            <v-divider></v-divider>
-                                            <div class="text-subtitle-2 mt-2 mb-2">Settings</div>
-                                            <v-switch v-model="editedAllowComments" label="Allow Comments" density="compact" hide-details color="primary"></v-switch>
+                                        <v-col cols="12" class="mt-1">
+                                            <v-divider class="my-1"></v-divider>
+                                            <div class="text-caption font-weight-bold mb-0">Settings</div>
+                                            <v-switch v-model="editedAllowComments" label="Allow Comments" density="compact" hide-details color="primary" class="ma-0 pa-0" style="min-height: 24px;"></v-switch>
                                         </v-col>
                                     </v-row>
                                 </v-expansion-panel-text>
@@ -153,6 +180,7 @@
                             </v-expansion-panel>
                         </v-expansion-panels>
                     </div>
+                </v-navigation-drawer>
                 </div>
             </div>
         </v-col>
@@ -180,7 +208,24 @@ const markdownTheme = computed(() => {
 });
 
 const openSidebarGroups = ref(['attachments', 'comments', 'permissions']);
-const showPreview = ref(false);
+const viewMode = ref('EDIT'); // 'EDIT', 'SPLIT', 'PREVIEW'
+const showSettings = ref(false);
+
+const permissionsSummary = computed(() => {
+    const parts = [];
+    if (editedPublicRead.value) parts.push('Pub:R' + (editedPublicWrite.value ? '/W' : ''));
+    if (editedGroupRead.value) parts.push('Grp:R' + (editedGroupWrite.value ? '/W' : ''));
+    return parts.length ? parts.join(', ') : 'Private';
+});
+
+const attachmentsSummary = computed(() => {
+    const count = documentStore.currentDocument?.attachments?.length || 0;
+    return count === 0 ? 'No Attachments' : `${count} Attachment${count > 1 ? 's' : ''}`;
+});
+
+const settingsSummary = computed(() => {
+    return `Perms: ${permissionsSummary.value} | ${attachmentsSummary.value}`;
+});
 
 const editedTitle = ref('');
 const editedContent = ref('');
@@ -324,8 +369,19 @@ const removeAttachment = async (attId) => {
     }
 };
 
-const togglePreview = () => {
-    showPreview.value = !showPreview.value;
+const viewModeLabel = computed(() => {
+    switch (viewMode.value) {
+        case 'EDIT': return 'Split View';
+        case 'SPLIT': return 'Preview Only';
+        case 'PREVIEW': return 'Edit Only';
+        default: return 'View';
+    }
+});
+
+const toggleViewMode = () => {
+    if (viewMode.value === 'EDIT') viewMode.value = 'SPLIT';
+    else if (viewMode.value === 'SPLIT') viewMode.value = 'PREVIEW';
+    else viewMode.value = 'EDIT';
 };
 
 const goBack = () => {
@@ -348,8 +404,8 @@ watch([editedTitle, editedContent, editedTags, editedStatus, editedCategoryId, e
 });
 
 // Watch for changes and render mermaid in preview
-watch([compiledMarkdown, showPreview, markdownTheme], async () => {
-    if (showPreview.value) {
+watch([compiledMarkdown, viewMode, markdownTheme], async () => {
+    if (viewMode.value === 'PREVIEW' || viewMode.value === 'SPLIT') {
         // Initialize Mermaid with correct theme
         mermaid.initialize({ 
             startOnLoad: false,

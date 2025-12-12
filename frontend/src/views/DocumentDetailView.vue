@@ -1,19 +1,24 @@
 <template>
-    <v-container fluid class="fill-height pa-0 ma-0" style="width: 100%; max-width: 100%;">
-      <v-row no-gutters class="fill-height">
-        <v-col cols="12" class="d-flex flex-column fill-height pa-0 ma-0">
-            <div class="d-flex flex-column fill-height">
+    <v-container fluid class="pa-0 ma-0" style="width: 100%; max-width: 100%;">
+      <v-row no-gutters>
+        <v-col cols="12" class="d-flex flex-column pa-0 ma-0">
+            <div class="d-flex flex-column">
                  <!-- Header -->
-                  <v-toolbar dense flat class="border-b" color="surface">
+                  <v-toolbar density="compact" flat class="border-b" color="surface" style="position: sticky; top: 0; z-index: 100;">
                        <v-btn icon @click="goBack" data-test="back-button">
                          <v-icon>mdi-arrow-left</v-icon>
                      </v-btn>
-                    <v-toolbar-title class="d-flex align-center">
-                        <span class="mr-3">{{ documentStore.currentDocument?.title }}</span>
+                    <v-toolbar-title style="flex: 0 1 auto; min-width: 0;" class="mr-4">
+                        <span class="text-truncate d-block">{{ documentStore.currentDocument?.title }}</span>
+                    </v-toolbar-title>
+
+                    <!-- Metadata Group -->
+                    <div class="d-flex align-center hidden-xs-only" style="flex: 1 1 auto; min-width: 0; overflow: hidden;">
+                         <!-- Tags -->
                         <v-chip 
                             v-for="tag in documentStore.currentDocument?.tags" 
                             :key="tag.id" 
-                            size="small" 
+                            size="x-small" 
                             label 
                             color="primary" 
                             variant="outlined" 
@@ -21,7 +26,36 @@
                         >
                             {{ tag.name }}
                         </v-chip>
-                    </v-toolbar-title>
+
+                        <v-divider vertical class="mx-2 hidden-sm-and-down" v-if="documentStore.currentDocument?.author"></v-divider>
+
+                        <!-- Author Info -->
+                        <div class="d-flex flex-column ml-1 hidden-sm-and-down" v-if="documentStore.currentDocument?.author" style="white-space: nowrap;">
+                            <span class="text-caption font-weight-bold">
+                                {{ documentStore.currentDocument.author?.name || documentStore.currentDocument.author?.username }}
+                                <span v-if="documentStore.currentDocument.author?.department" class="text-grey">({{ documentStore.currentDocument.author.department.name }})</span>
+                            </span>
+                        </div>
+
+                         <v-divider vertical class="mx-2 hidden-md-and-down"></v-divider>
+
+                        <!-- Permissions (Mini) -->
+                        <div class="d-flex align-center hidden-md-and-down" v-if="documentStore.currentDocument">
+                            <v-chip size="x-small" density="comfortable" label class="mr-1" :color="documentStore.currentDocument.publicRead ? 'success' : 'grey'" variant="text" :prepend-icon="documentStore.currentDocument.publicRead ? 'mdi-check' : 'mdi-close'">
+                                Public Read
+                            </v-chip>
+                             <v-chip v-if="documentStore.currentDocument.groupRead" size="x-small" density="comfortable" label class="mr-1" color="success" variant="text" prepend-icon="mdi-account-group">
+                                Group Read
+                            </v-chip>
+                        </div>
+
+                        <v-divider vertical class="mx-2 hidden-md-and-down"></v-divider>
+
+                        <!-- Updated Date -->
+                        <span class="text-caption text-grey hidden-sm-and-down" style="white-space: nowrap;">
+                            {{ new Date(documentStore.currentDocument.updatedAt).toLocaleDateString() }}
+                        </span>
+                    </div>
                     
                     <v-spacer></v-spacer>
 
@@ -47,8 +81,7 @@
                  </v-toolbar>
 
                 <!-- Content Area -->
-                <div class="d-flex flex-grow-1 flex-column" style="height: calc(100vh - 128px); overflow-y: auto;">
-                    <!-- Preview Container -->
+                <div class="d-flex flex-grow-1 flex-column">
                     <div class="d-flex flex-grow-1">
                         <div 
                             class="pa-4 flex-grow-1 markdown-body"
@@ -57,34 +90,6 @@
                             :data-theme="markdownTheme"
                             :key="markdownTheme"
                         ></div>
-                    </div>
-    
-                    <!-- Meta Info Bar -->
-                    <div v-if="documentStore.currentDocument" class="pa-4 border-t">
-                        <div class="d-flex flex-wrap align-center">
-                            <span class="text-caption font-weight-bold mr-2">Author:</span>
-                            <span class="text-caption mr-4">{{ documentStore.currentDocument.author?.name || documentStore.currentDocument.author?.username }} 
-                                <span v-if="documentStore.currentDocument.author?.department" class="text-grey">({{ documentStore.currentDocument.author.department.name }})</span>
-                            </span>
-
-                            <v-divider vertical class="mx-2"></v-divider>
-
-                            <span class="text-caption font-weight-bold mr-2">Permissions:</span>
-                            
-                            <v-chip size="x-small" label class="mr-1" :color="documentStore.currentDocument.publicRead ? 'success' : 'grey'" variant="outlined">
-                                <v-icon start size="small">mdi-web</v-icon> Public Read
-                            </v-chip>
-                            <v-chip size="x-small" label class="mr-1" :color="documentStore.currentDocument.publicWrite ? 'warning' : 'grey'" variant="outlined">
-                                <v-icon start size="small">mdi-pencil</v-icon> Public Write
-                            </v-chip>
-                            
-                            <v-chip size="x-small" label class="mr-1" :color="documentStore.currentDocument.groupRead ? 'success' : 'grey'" variant="outlined">
-                                <v-icon start size="small">mdi-account-group</v-icon> Group Read
-                            </v-chip>
-                            <v-chip size="x-small" label class="mr-1" :color="documentStore.currentDocument.groupWrite ? 'warning' : 'grey'" variant="outlined">
-                                <v-icon start size="small">mdi-account-edit</v-icon> Group Write
-                            </v-chip>
-                        </div>
                     </div>
 
                     <!-- Comments Section -->

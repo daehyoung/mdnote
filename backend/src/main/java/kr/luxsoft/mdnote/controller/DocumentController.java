@@ -44,7 +44,8 @@ public class DocumentController {
         }
         
         Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by(direction, sortField));
-        return documentService.getAllDocuments(categoryId, status, query, pageable, principal.getName());
+        String callbackUsername = (principal != null) ? principal.getName() : null;
+        return documentService.getAllDocuments(categoryId, status, query, pageable, callbackUsername);
     }
 
     @GetMapping("/{id}")
