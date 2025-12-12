@@ -50,8 +50,9 @@ const router = createRouter({
             },
             {
                 path: 'categories',
-                name: 'categories',
-                component: () => import('../views/CategoryManageView.vue')
+                name: 'admin-categories', // Renamed for clarity key
+                component: () => import('../views/CategoryManageView.vue'),
+                props: { scope: 'SYSTEM' }
             }
           ]
         },
@@ -59,6 +60,13 @@ const router = createRouter({
           path: 'profile',
           name: 'profile',
           component: () => import('../views/ProfileView.vue')
+        },
+        {
+          path: 'my-categories',
+          name: 'my-categories',
+          component: () => import('../views/CategoryManageView.vue'),
+          props: { scope: 'USER' },
+          meta: { requiresAuth: true }
         }
       ]
     }

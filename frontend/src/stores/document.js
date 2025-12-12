@@ -6,7 +6,9 @@ export const useDocumentStore = defineStore('document', {
     documents: [],
     currentDocument: null,
     comments: [], // New state for comments
-    categories: [], // Tree structure
+    categories: [], // Deprecated or Combined? Let's use separate states
+    systemCategories: [],
+    userCategories: [],
     loading: false,
     error: null,
     appMode: 'VIEW', // Added shared state for UI Mode
@@ -17,7 +19,8 @@ export const useDocumentStore = defineStore('document', {
     totalElements: 0,
     filterStatus: null, // For status filtering
     selectedCategoryId: null, // For category filtering
-    searchQuery: '', // Add search query state
+    // Sorting State
+    sortOrder: 'updatedAt,desc',
   }),
   actions: {
     async fetchDocuments(categoryId = null) {
@@ -48,6 +51,11 @@ export const useDocumentStore = defineStore('document', {
         // Handle Search Query
         if (this.searchQuery) {
             params.append('query', this.searchQuery);
+        }
+
+        // Handle Sorting
+        if (this.sortOrder) {
+            params.append('sort', this.sortOrder);
         }
 
         const response = await api.get(`/documents?${params.toString()}`);
@@ -131,14 +139,16 @@ export const useDocumentStore = defineStore('document', {
     async fetchCategories() {
         try {
             const response = await api.get('/categories/tree');
-            this.categories = response.data;
+            this.systemCategories = response.data.system || [];
+            this.userCategories = response.data.user || [];
+            this.categories = [...this.systemCategories, ...this.userCategories]; 
         } catch (error) {
             console.error("Failed to fetch categories", error);
         }
     },
-    async createCategory(name, parentId) {
+    async createCategory(name, parentId, scope = 'SYSTEM') {
         try {
-            await api.post('/categories', { name, parentId });
+            await api.post('/categories', { name, parentId, scope });
             await this.fetchCategories();
         } catch (error) {
              console.error("Failed to create category", error);
@@ -224,6 +234,10 @@ export const useDocumentStore = defineStore('document', {
     },
     setFilterStatus(status) {
         this.filterStatus = status;
+        this.page = 1; // Reset to first page
+    },
+    setSortOrder(order) {
+        this.sortOrder = order;
         this.page = 1; // Reset to first page
     },
     setPage(page) {

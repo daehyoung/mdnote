@@ -39,6 +39,34 @@
                         @update:modelValue="handleStatusFilter"
                     ></v-select>
 
+                    <!-- Sort Field -->
+                    <v-select
+                        v-model="sortField"
+                        :items="[
+                            { title: 'Title', value: 'title' },
+                            { title: 'Date', value: 'updatedAt' },
+                            { title: 'Author', value: 'author.name' }
+                        ]"
+                        label="Sort By"
+                        dense
+                        outlined
+                        hide-details
+                        style="max-width: 140px;"
+                        class="mr-2"
+                        @update:modelValue="handleSortChange"
+                    ></v-select>
+
+                    <!-- Sort Direction Toggle -->
+                    <v-btn 
+                        icon 
+                        variant="text" 
+                        class="mr-4"
+                        @click="toggleSortDirection"
+                        :title="sortDirection === 'asc' ? 'Ascending' : 'Descending'"
+                    >
+                         <v-icon>{{ sortDirection === 'asc' ? 'mdi-sort-ascending' : 'mdi-sort-descending' }}</v-icon>
+                    </v-btn>
+
                     <v-spacer></v-spacer>
 
                     <v-btn 
@@ -148,6 +176,29 @@ const currentPage = computed({
     set: (val) => documentStore.setPage(val)
 });
 
+const sortField = ref('updatedAt');
+const sortDirection = ref('desc');
+
+const handleStatusFilter = (status) => {
+    documentStore.setFilterStatus(status);
+    documentStore.fetchDocuments();
+};
+
+const updateSort = () => {
+    const sortString = `${sortField.value},${sortDirection.value}`;
+    documentStore.setSortOrder(sortString);
+    documentStore.fetchDocuments();
+};
+
+const handleSortChange = () => {
+    updateSort();
+};
+
+const toggleSortDirection = () => {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+    updateSort();
+};
+
 const handleSearch = () => {
     if (searchQueryInput.value) {
         documentStore.searchDocuments(searchQueryInput.value); 
@@ -158,11 +209,6 @@ const handleSearch = () => {
 };
 
 const handlePageChange = () => {
-    fetchDocuments();
-};
-
-const handleStatusFilter = () => {
-    documentStore.setFilterStatus(filterStatus.value);
     fetchDocuments();
 };
 

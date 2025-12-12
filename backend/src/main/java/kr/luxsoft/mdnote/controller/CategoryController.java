@@ -18,15 +18,22 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @GetMapping("/tree")
-    public ResponseEntity<List<CategoryDTO>> getCategoryTree() {
-        return ResponseEntity.ok(categoryService.getCategoryTree());
+    public ResponseEntity<Map<String, List<CategoryDTO>>> getCategoryTree(java.security.Principal principal) {
+        String username = (principal != null) ? principal.getName() : null;
+        return ResponseEntity.ok(categoryService.getCategoryTree(username));
     }
 
     @PostMapping
-    public ResponseEntity<Category> create(@RequestBody Map<String, Object> payload) {
+    public ResponseEntity<Category> create(@RequestBody Map<String, Object> payload, java.security.Principal principal) {
         String name = (String) payload.get("name");
         Long parentId = payload.containsKey("parentId") && payload.get("parentId") != null ? ((Number) payload.get("parentId")).longValue() : null;
-        return ResponseEntity.ok(categoryService.createCategory(name, parentId));
+        String scope = (String) payload.getOrDefault("scope", "SYSTEM"); 
+        
+        // If client doesn't send scope but has parentId, scope is inferred in service, but we pass it anyway.
+        // If client sends "USER" and has no parent, it's a User Root.
+        
+        String username = (principal != null) ? principal.getName() : null;
+        return ResponseEntity.ok(categoryService.createCategory(name, parentId, username, scope));
     }
 
     @PutMapping("/{id}")

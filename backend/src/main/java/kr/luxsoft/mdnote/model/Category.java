@@ -20,4 +20,8 @@ public class Category {
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private Category parent;
+
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
 }

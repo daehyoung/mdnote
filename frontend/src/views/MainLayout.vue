@@ -34,22 +34,48 @@
     </v-app-bar>
   
     <v-navigation-drawer v-model="drawer" width="300" v-if="!isAdminRoute">
-      <v-list-subheader>Categories</v-list-subheader>
+      <!-- System Categories -->
+      <v-list-subheader>System Categories</v-list-subheader>
       <v-list density="compact" nav class="sidebar-list">
           <v-list-item
               prepend-icon="mdi-folder-outline"
-              title="All Categories"
+              title="All Documents"
               @click="filterByCategory(null)"
               :active="!documentStore.selectedCategoryId"
               color="primary"
           ></v-list-item>
            <RecursiveList 
-              v-for="cat in documentStore.categories" 
+              v-for="cat in documentStore.systemCategories" 
               :key="cat.id" 
               :item="cat" 
               @select="filterByCategory"
               :selectedId="documentStore.selectedCategoryId"
           />
+      </v-list>
+
+      <v-divider class="my-2"></v-divider>
+
+      <!-- User Categories (My Documents) -->
+      <div class="d-flex align-center px-4 pt-2">
+          <v-list-subheader class="pl-0">My Documents</v-list-subheader>
+          <v-spacer></v-spacer>
+          <!-- Manage Button -->
+          <v-btn icon size="x-small" variant="text" to="/my-categories" title="Manage Folders">
+              <v-icon>mdi-cog</v-icon>
+          </v-btn>
+      </div>
+      
+      <v-list density="compact" nav class="sidebar-list">
+           <RecursiveList 
+              v-for="cat in documentStore.userCategories" 
+              :key="cat.id" 
+              :item="cat" 
+              @select="filterByCategory"
+              :selectedId="documentStore.selectedCategoryId"
+          />
+           <v-list-item v-if="documentStore.userCategories.length === 0" class="text-caption text-grey">
+              No personal folders yet.
+           </v-list-item>
       </v-list>
     </v-navigation-drawer>
     
@@ -125,6 +151,7 @@ const filterByCategory = async (category) => {
 
 
 
+    
 onMounted(async () => {
     // Initial fetch of categories for the sidebar
     documentStore.fetchCategories();

@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <div class="d-flex align-center mb-4">
-        <h1 class="text-h4">Category Management</h1>
+        <h1 class="text-h4">{{ pageTitle }}</h1>
         <v-spacer></v-spacer>
         <v-btn color="primary" @click="openDialog(null)">Add Root Category</v-btn>
     </div>
@@ -9,7 +9,7 @@
     <v-card class="pa-4">
         <v-list>
             <RecursiveCategoryList 
-                v-for="cat in docStore.categories" 
+                v-for="cat in categoryList" 
                 :key="cat.id" 
                 :item="cat"
                 @edit="openDialog"
@@ -38,16 +38,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed, defineProps } from 'vue'; // Added defineProps
 import { useDocumentStore } from '../stores/document';
 import RecursiveCategoryList from '../components/RecursiveCategoryList.vue';
+
+const props = defineProps({
+    scope: {
+        type: String,
+        default: 'SYSTEM' // 'SYSTEM' or 'USER'
+    }
+});
 
 const docStore = useDocumentStore();
 const dialog = ref(false);
 const isEdit = ref(false);
 const editedItem = ref({ id: null, name: '', parentId: null });
 
+// Computed list based on scope
+const categoryList = computed(() => {
+    return props.scope === 'USER' ? docStore.userCategories : docStore.systemCategories;
+});
+
+const pageTitle = computed(() => {
+    return props.scope === 'USER' ? 'My Folders' : 'System Category Management';
+});
+
 onMounted(() => {
+    // We can rely on MainLayout fetching, but safe to fetch again or generic fetch
     docStore.fetchCategories();
 });
 
@@ -74,7 +91,8 @@ const save = async () => {
     if (isEdit.value) {
         await docStore.updateCategory(editedItem.value.id, editedItem.value.name);
     } else {
-        await docStore.createCategory(editedItem.value.name, editedItem.value.parentId);
+        // Pass scope to createCategory
+        await docStore.createCategory(editedItem.value.name, editedItem.value.parentId, props.scope);
     }
     closeDialog();
 };

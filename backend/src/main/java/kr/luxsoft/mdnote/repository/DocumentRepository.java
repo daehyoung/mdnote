@@ -15,10 +15,10 @@ import org.springframework.data.repository.query.Param;
 public interface DocumentRepository extends JpaRepository<Document, Long> {
     
     // Consolidated Search with Permissions
-    @Query("SELECT DISTINCT d FROM Document d LEFT JOIN d.tags t WHERE " +
+    @Query("SELECT d FROM Document d WHERE " +
             "(:categoryId IS NULL OR d.category.id = :categoryId) AND " +
             "(:status IS NULL OR d.status = :status) AND " +
-            "(:query IS NULL OR :query = '' OR LOWER(d.title) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%'))) AND " +
+            "(:query IS NULL OR :query = '' OR LOWER(d.title) LIKE LOWER(CONCAT('%', :query, '%')) OR EXISTS (SELECT t FROM d.tags t WHERE LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%')))) AND " +
             "(" +
             " :isAdmin = true OR " +
             " d.author.username = :username OR " +
@@ -34,19 +34,19 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             @Param("isAdmin") boolean isAdmin,
             Pageable pageable);
 
-    @Query("SELECT DISTINCT d FROM Document d LEFT JOIN d.tags t WHERE " +
+    @Query("SELECT d FROM Document d WHERE " +
             "(:categoryId IS NULL OR d.category.id = :categoryId) AND " +
             "(:status IS NULL OR d.status = :status) AND " +
-            "(:query IS NULL OR :query = '' OR LOWER(d.title) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%')))")
+            "(:query IS NULL OR :query = '' OR LOWER(d.title) LIKE LOWER(CONCAT('%', :query, '%')) OR EXISTS (SELECT t FROM d.tags t WHERE LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%'))))")
      Page<Document> findAllAdmin(
             @Param("categoryId") Long categoryId, 
             @Param("status") String status, 
             @Param("query") String query,
             Pageable pageable);
 
-    @Query("SELECT DISTINCT d FROM Document d LEFT JOIN d.tags t WHERE " +
+    @Query("SELECT d FROM Document d WHERE " +
            "LOWER(d.title) LIKE LOWER(CONCAT('%', CAST(:query AS string), '%')) OR " +
-           "LOWER(t.name) LIKE LOWER(CONCAT('%', CAST(:query AS string), '%'))")
+           "EXISTS (SELECT t FROM d.tags t WHERE LOWER(t.name) LIKE LOWER(CONCAT('%', CAST(:query AS string), '%')))")
     List<Document> searchDocuments(@Param("query") String query); // Legacy or Admin usage? We should deprecate/update this too.
 
     // Let's replace the strict 'findAll' and 'findByStatus' logic in Service with the consolidated query above.

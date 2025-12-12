@@ -8,6 +8,12 @@ import java.util.List;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    List<Category> findByParentIsNull(); // Roots
+    List<Category> findByParentIsNull(); // All Roots (Legacy)
+    List<Category> findByParentIsNullAndOwnerIsNull(); // System Roots
+    List<Category> findByParentIsNullAndOwner(kr.luxsoft.mdnote.model.User owner); // User Roots
+    
+    List<Category> findByOwnerIsNull(); // All System Categories
+    List<Category> findByOwner(kr.luxsoft.mdnote.model.User owner); // All User Categories
+    
     List<Category> findAll();
 }
