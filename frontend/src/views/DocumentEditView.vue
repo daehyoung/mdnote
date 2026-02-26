@@ -403,6 +403,30 @@ watch([editedTitle, editedContent, editedTags, editedStatus, editedCategoryId, e
     }
 });
 
+watch(editedTags, (newTags) => {
+    if (!newTags) return;
+    const cleaned = newTags.map(t => typeof t === 'string' ? t.trim() : t).filter(t => t !== '');
+    
+    // Check if changes are needed to avoid infinite loop
+    let needsUpdate = false;
+    if (cleaned.length !== newTags.length) {
+        needsUpdate = true;
+    } else {
+        for (let i = 0; i < cleaned.length; i++) {
+            if (cleaned[i] !== newTags[i]) {
+                needsUpdate = true;
+                break;
+            }
+        }
+    }
+
+    if (needsUpdate) {
+        nextTick(() => {
+            editedTags.value = cleaned;
+        });
+    }
+}, { deep: true });
+
 // Watch for changes and render mermaid in preview
 watch([compiledMarkdown, viewMode, markdownTheme], async () => {
     if (viewMode.value === 'PREVIEW' || viewMode.value === 'SPLIT') {

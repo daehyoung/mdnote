@@ -167,11 +167,15 @@ public class DocumentService {
                 if (tag.getId() != null) {
                     // Existing tag by ID
                     tagRepository.findById(tag.getId()).ifPresent(processedTags::add);
-                } else if (tag.getName() != null && !tag.getName().isEmpty()) {
-                    // Find by name or create
-                    Tag existing = tagRepository.findByName(tag.getName())
-                        .orElseGet(() -> tagRepository.save(new Tag(tag.getName())));
-                    processedTags.add(existing);
+                } else if (tag.getName() != null) {
+                    // Trim and check
+                    String processedName = tag.getName().trim();
+                    if (!processedName.isEmpty()) {
+                        // Find by name or create
+                        Tag existing = tagRepository.findByName(processedName)
+                            .orElseGet(() -> tagRepository.save(new Tag(processedName)));
+                        processedTags.add(existing);
+                    }
                 }
             }
             doc.setTags(processedTags);

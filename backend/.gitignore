@@ -37,3 +37,10 @@ out/
 .vscode/
 target/
 uploads/
+
+backend/target/
+backend/uploads/
+.DS_Store
+
+frontend/node_modules/
+frontend/dist/
