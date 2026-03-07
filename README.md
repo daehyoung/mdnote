@@ -86,6 +86,7 @@
     - e2e test
 * 배포
     * docker build
+    * setup_firewall.sh (Ubuntu UFW 설정)
 
 ---
 
@@ -98,7 +99,13 @@
 ./deploy.sh
 ```
 
-### 2) 상세 가이드
+### 2) 우분투 방화벽 설정 (Firewall Setup)
+우분투 서버에서 서비스를 운영할 경우 필요한 포트(80, 443, 3000, 8080)를 개방해야 합니다. **[setup_firewall.sh](./setup_firewall.sh)** 스크립트를 통해 원클릭으로 설정이 가능합니다.
+```bash
+sudo ./setup_firewall.sh
+```
+
+### 3) 상세 가이드
 배포 아키텍처 및 환경 설정에 대한 상세 정보는 **[통합 배포 설계서 (`06_deployment_plan.md`)](./docs/06_deployment_plan.md)**를 참조하시기 바랍니다.
 
 ---
