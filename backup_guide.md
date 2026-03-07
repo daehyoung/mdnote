@@ -19,22 +19,25 @@ Run the script from the project root:
 
 ---
 
-## Restore
-
-### 1. Restore Database
-To restore the database from a backup file:
+### 1. Automated Restore (Recommended)
+You can use the `restore.sh` script to interactively choose a backup to restore:
 ```bash
-# 1. Unzip the backup file
-gunzip backups/db_mdnote_YYYYMMDD_HHMMSS.sql.gz
-
-# 2. Restore using docker exec
-docker exec -i md-note_postgres_1 psql -U postgres -d mdnote < backups/db_mdnote_YYYYMMDD_HHMMSS.sql
+chmod +x restore.sh
+./restore.sh
 ```
 
-### 2. Restore Upload Files
-To restore uploaded files:
+### 2. Manual Restore (Advanced)
+If you prefer to do it manually:
+
+#### Database Restore
 ```bash
-# 1. Extract the tarball (be careful as it might overwrite existing files)
+# Unzip and restore in one pipe
+gunzip -c backups/db_mdnote_YYYYMMDD_HHMMSS.sql.gz | docker exec -i md-note_postgres_1 psql -U postgres -d mdnote
+```
+
+#### Upload Files Restore
+```bash
+# Extract the tarball
 tar -xzf backups/uploads_YYYYMMDD_HHMMSS.tar.gz -C .
 ```
 
