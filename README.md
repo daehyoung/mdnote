@@ -89,7 +89,21 @@
 
 ---
 
-## 🛠 개발 정보 (Development Info)
+## � 실행 및 배포 (Run & Deploy)
+본 시스템은 Docker를 이용한 원클릭 빌드 및 배포를 지원합니다.
+
+### 1) 자동 배포 스크립트 (Recommended)
+루트 디렉토리의 **[deploy.sh](./deploy.sh)** 스크립트를 실행하면 프론트엔드 빌드부터 DB 구동, 백엔드 연결까지 자동으로 수행됩니다.
+```bash
+./deploy.sh
+```
+
+### 2) 상세 가이드
+배포 아키텍처 및 환경 설정에 대한 상세 정보는 **[통합 배포 설계서 (`06_deployment_plan.md`)](./docs/06_deployment_plan.md)**를 참조하시기 바랍니다.
+
+---
+
+## �🛠 개발 정보 (Development Info)
 * **개발 구현 Model**: Gemini 3 Pro
 * **Antigravity Version**: 1.19.6
 * **작성자**: 조대형 ([daehyoung.cho@gmail.com](mailto:daehyoung.cho@gmail.com))
