@@ -111,7 +111,24 @@ components:
           type: string
         categoryId:
           type: integer
+        status:
+          type: string
+        groupRead:
+          type: boolean
+        groupWrite:
+          type: boolean
+        publicRead:
+          type: boolean
+        publicWrite:
+          type: boolean
+        allowComments:
+          type: boolean
         tags:
           type: array
           items:
-            type: string
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string

@@ -2,7 +2,7 @@
 
 ## 1. User Management
 
-### 1.1 Login Flow
+### 1.1 Login Flow (`UC-U-01`)
 **Actor**: User
 1.  **User** visits `/login`.
 2.  **System** displays Login Form (Logo, Username field, Password field, Login Button).
@@ -12,7 +12,7 @@
     *   *If valid*: System stores JWT token, redirects to `/`.
     *   *If invalid*: System shows error message "Invalid credentials".
 
-### 1.2 Profile Management
+### 1.2 Profile Management (`UC-U-02`)
 **Actor**: User
 1.  **User** clicks on "Avatar/Name" in top-right header.
 2.  **System** shows dropdown menu: [Profile, Logout].
@@ -26,7 +26,7 @@
 
 ## 2. Document Management
 
-### 2.1 View Document List (Home)
+### 2.1 View Document List (Home) (`UC-D-01`)
 **Actor**: User
 1.  **User** logs in or visits `/`.
 2.  **System** displays **Document List**:
@@ -36,7 +36,7 @@
 3.  **User** can filter by Status (All/Draft/Published/etc.) if allowed or search by keyword.
 4.  **User** clicks on a document to Read.
 
-### 2.2 Create / Edit Document
+### 2.2 Create / Edit Document (`UC-D-02`)
 **Actor**: Author (or User with Write Permission)
 1.  **Author** clicks "New Document" or "Edit" on an existing document.
 2.  **System** opens **Document Edit View** (`/documents/:id/edit`).
@@ -52,7 +52,7 @@
     *   **Allow Comments**: Toggles whether comments are enabled for this doc.
 7.  **Author** saves via "Save" button.
 
-### 2.3 Read Document (Detail View)
+### 2.3 Read Document (Detail View) (`UC-D-03`)
 **Actor**: User
 1.  **User** clicks on a document from the list.
 2.  **System** opens **Document Detail View** (`/documents/:id`).
@@ -64,7 +64,7 @@
     *   User can add a new comment (if logged in).
 4.  **System** shows "Edit" button ONLY if user has write permission (Owner, Admin, or Group/Public Write).
 
-### 2.3 Search Documents
+### 2.4 Search Documents (`UC-D-04`)
 **Actor**: User
 1.  **User** types "Roadmap" in Global Search Bar (Header).
 2.  **System** suggests results as user types (optional) or waits for Enter.
@@ -76,41 +76,19 @@
 
 ## 3. System Administration
 
-### 3.1 User Management
+### 3.1 User Management (`UC-A-01`)
 **Actor**: Admin
 1.  **Admin** navigates to `/admin/users`.
 2.  **System** displays **User List** table.
     *   Columns: Username, Name, Department, Role, Status, Actions.
 3.  **Admin** clicks "Add User".
-
-### 6. User Profile Management
-**Story**:
-1. User clicks "Profile" in the top bar.
-2. User sees their info (Name, Role, Organization).
-3. User creates a new password and clicks "Update Password".
-4. System confirms update.
-
-### 7. Organization Management (Admin)
-**Story**:
-1. Admin navigates to "Organization Management".
-2. Admin sees a tree of organizations (e.g., Company -> Engineering -> Backend).
-3. Admin clicks "Add Child Organization" on a node to create a sub-team.
-4. Admin assigns a User to an Organization node via the User List.
-
-### 8. Document Lifecycle & Tags
-**Story**:
-1. User creates a document. Sets status to "Draft".
-2. User adds tags "Java", "Spring".
-3. User saves.
-4. User changes status to "Review" when ready.
-5. Admin/Approver (mock) changes status to "Published".
 4.  **System** shows **Create User Modal**.
     *   Fields: Username, Password, Name, Email, Department (Tree Select), Role (Select).
 5.  **Admin** fills form and saves.
 6.  **System** creates user `POST /users` (Admin API).
 7.  **System** refreshes list.
 
-### 3.2 System Settings
+### 3.2 System Settings (`UC-A-02`)
 **Actor**: Admin
 1.  **Admin** navigates to `/admin/settings`.
 2.  **System** displays configuration form.

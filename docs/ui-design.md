@@ -39,7 +39,8 @@
 - **Settings Panel**:
     - Category selector.
     - Tag input.
-    - Permission settings.
+    - Permission settings (Public/Group Read/Write).
+    - Allow Comments toggle.
     - Lifecycle actions (Save Draft, Request Approval).
 
 ### 5. Admin Console

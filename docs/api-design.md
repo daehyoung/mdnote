@@ -14,11 +14,12 @@
     - id (PK), name, parent_id (Self-FK)
 - **Document**
     - id (PK), title, content (Text), category_id (FK), author_id (FK), status (DRAFT, REVIEW, PUBLISHED, etc.)
+    - public_read, public_write, group_read, group_write, allow_comments (Boolean)
     - created_at, updated_at
 - **Tag**
     - id (PK), name
 - **DocumentTag**
-    - doc_id (FK), tag_id (FK)
+    - document_id (FK), tag_id (FK)
 - **Attachment**
     - id (PK), doc_id (FK), file_path, file_name, file_size
 - **Comment**
@@ -58,6 +59,11 @@ CREATE TABLE document (
     category_id INTEGER REFERENCES category(id),
     author_id INTEGER REFERENCES users(id),
     status VARCHAR(20) DEFAULT 'DRAFT',
+    group_read BOOLEAN DEFAULT TRUE,
+    group_write BOOLEAN DEFAULT FALSE,
+    public_read BOOLEAN DEFAULT TRUE,
+    public_write BOOLEAN DEFAULT FALSE,
+    allow_comments BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -67,9 +73,9 @@ CREATE TABLE tag (
     name VARCHAR(50) UNIQUE NOT NULL
 );
 
-CREATE TABLE document_tag (
-    doc_id INTEGER REFERENCES document(id),
+CREATE TABLE document_tags (
+    document_id INTEGER REFERENCES document(id),
     tag_id INTEGER REFERENCES tag(id),
-    PRIMARY KEY (doc_id, tag_id)
+    PRIMARY KEY (document_id, tag_id)
 );
 ```
