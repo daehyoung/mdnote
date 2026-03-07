@@ -7,13 +7,13 @@
 - `frontend/src/views/HomeView.vue`
 
 ## [Context Summary]
-- **[Push]**: 프론트엔드/백엔드 테스트 보강 및 문서화 작업을 완료하고 원격 저장소에 푸시함.
-- **[Cleanup]**: 불필요한 테스트 출력 파일 정리 및 .gitignore 최적화 완료.
+- **[Reclassification]**: 백엔드 테스트를 통합 테스트(Scenario Verifier)와 단위 테스트(JUnit)로 명확히 재분류 완료.
 
 ## [Next Step]
 - 실시간 협업 기능(커멘트 등) 고도화 및 품질 관리 절차 적용.
 
-- [x] 도커 및 실제 DB 기반- [x] 프론트엔드 테스트 강화 (Vitest/Cypress)
+- [x] 도커 및 실제 DB 기반 테스트 환경 구축
+- [x] 프론트엔드 테스트 강화 (Vitest/Cypress)
 - [ ] 백엔드 성능 최적화 (Next Phase)
 분석 및 문서화 완료
 - [x] 불일치 문서(`api-design`, `ui-design` 등) 교정 완료
