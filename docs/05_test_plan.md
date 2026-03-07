@@ -43,6 +43,10 @@
  
  ## 4. 테스트 수행 결과 (Test Execution Results)
  
+ ### 4.1 Backend Integration Tests (Python Scenario Verifier)
+ - **수행 도구**: Python Scenario Verifier (`tests/scenario_verifier.py`)
+ - **수행 환경**: Docker (Postgres 15 + Spring Boot Backend)
+ - **검증 시나리오**:
 - [x] **[UC-U-01]** 로그인 및 JWT 토큰 획득 성공 (Seeded User: `test`)
 - [x] **[UC-D-02]** 실제 데이터베이스 상의 문서 생성 및 ID 발급 확인
 - [x] **[UC-D-03]** 생성된 문서의 상세 조회 및 검색(Query) 정합성 확인
@@ -72,12 +76,13 @@
     - [x] `comments.cy.js`: 실시간 댓글 작성 및 표시 확인 (UC-D-03)
 - **결과**: **PASS** (2026-03-08)
 
-### 4.4 Backend Integration Tests (JUnit 5)
-- **수행 도구**: Spring Boot Test (MockMvc)
-- **검증 대상**:
-    - [x] `JwtTokenProviderTest.java`: 토큰 생성, 파싱, 만료 검증 (REQ-U-01)
-    - [x] `FileStorageServiceTest.java`: 파일 저장 및 Path Traversal 방어 (REQ-D-04)
-    - [x] `DocumentIntegrationTest.java`: 문서 CRUD API 및 DB 연동 (UC-D-02)
+### 4.4 Backend Unit Tests (JUnit 5)
+- **수행 도구**: Spring Boot Test (MockMvc / Mockito)
+- **검증 대상 (Unit/Service Logic)**:
+    - [x] `JwtTokenProviderTest.java`: 토큰 생성, 파싱, 만료 검사 (REQ-U-01)
+    - [x] `FileStorageServiceTest.java`: 파일 저장 로직 및 Path Traversal 방어 (REQ-D-04)
+    - [x] `DocumentIntegrationTest.java`: 문서 CRUD 로직 및 DB 계층 연동 (UC-D-02)
+    - [x] `DocumentServiceTest.java`: 권한 판별 및 비즈니스 로직 단위 검증
 - **결과**: **PASS** (2026-03-08)
 
 ---
