@@ -40,22 +40,45 @@
 - 테스트 코드 작성 시 클래스/메서드 수준에서 `@DisplayName` 또는 주석을 통해 `[REQ-XXX]`, `[UC-XXX]`를 명시하여 RTM과의 동기화를 유지합니다.
 
 ---
+ 
+ ## 4. 테스트 수행 결과 (Test Execution Results)
+ 
+- [x] **[UC-U-01]** 로그인 및 JWT 토큰 획득 성공 (Seeded User: `test`)
+- [x] **[UC-D-02]** 실제 데이터베이스 상의 문서 생성 및 ID 발급 확인
+- [x] **[UC-D-03]** 생성된 문서의 상세 조회 및 검색(Query) 정합성 확인
+- [x] **[UC-D-05]** 파일 업로드 및 다운로드 무결성 검증 완료
+- [x] **[UC-A-01]** 관리자 사용자 관리 Life-cycle (생성, 목록, 상태변경) 검증 완료
+- [x] **[UC-U-01/PWD]** 사용자 패스워드 자가 변경 및 로그인 연동 확인 
+- [x] **[UC-A-01/PWD]** 관리자에 의한 사용자 패스워드 강제 초기화 및 로그인 확인
+- [x] **[SECURITY]** 타인 패스워드 변경 시도 차단 (403 Forbidden) 확인
+- [x] **[SECURITY]** 일반 사용자의 관리자 API 접근 차단 (403 Forbidden) 확인
+- **결과**: **PASS** (2026-03-07)
 
-## 4. 통합 시나리오 테스트 결과 (Real DB Verification)
+### 4.2 Frontend Unit Tests (Vitest)
+- **수행 도구**: Vitest (Vue Test Utils, Pinia/Vuetify Mocks)
+- **검증 대상**:
+    - [x] `LoginView.spec.js`: 로그인 폼 유효성 검사 및 라우팅 (REQ-U-01)
+    - [x] `DocumentDetailView.spec.js`: 문서 상세 정보 렌더링 및 권한별 UI 가시성 (UC-D-03)
+    - [x] `DocumentEditView.spec.js`: 문서 편집/저장 기능 및 권한 토글 (UC-D-02)
+    - [x] `markdown.spec.js`: 마크다운 렌더링 및 Mermaid/Latex 확장 검증 (REQ-D-05)
+- **결과**: **PASS** (2026-03-08)
 
-### Python Scenario Verifier (`tests/scenario_verifier.py`)
-- **수행 환경**: Docker (Postgres 15 + Spring Boot Backend)
+### 4.3 E2E Integration Tests (Cypress)
+- **수행 도구**: Cypress
 - **검증 시나리오**:
-    - [x] **[UC-U-01]** 로그인 및 JWT 토큰 획득 성공 (Seeded User: `test`)
-    - [x] **[UC-D-02]** 실제 데이터베이스 상의 문서 생성 및 ID 발급 확인
-    - [x] **[UC-D-03]** 생성된 문서의 상세 조회 및 검색(Query) 정합성 확인
-    - [x] **[UC-D-05]** 파일 업로드 및 다운로드 무결성 검증 완료
-    - [x] **[UC-A-01]** 관리자 사용자 관리 Life-cycle (생성, 목록, 상태변경) 검증 완료
-    - [x] **[UC-U-01/PWD]** 사용자 패스워드 자가 변경 및 로그인 연동 확인 
-    - [x] **[UC-A-01/PWD]** 관리자에 의한 사용자 패스워드 강제 초기화 및 로그인 확인
-    - [x] **[SECURITY]** 타인 패스워드 변경 시도 차단 (403 Forbidden) 확인
-    - [x] **[SECURITY]** 일반 사용자의 관리자 API 접근 차단 (403 Forbidden) 확인
-- **최종 결과**: **PASS** (2026-03-07)
+    - [x] `login_flow.cy.js`: 실 브라우저 기반 로그인 및 세션 유지 (UC-U-01)
+    - [x] `document_management.cy.js`: 문서 생성 -> 조회 -> 삭제 풀 사이클 (UC-D-02)
+    - [x] `permissions.cy.js`: 부서/그룹 기반 권한 제어 실동작 확인 (UC-D-03)
+    - [x] `comments.cy.js`: 실시간 댓글 작성 및 표시 확인 (UC-D-03)
+- **결과**: **PASS** (2026-03-08)
+
+### 4.4 Backend Integration Tests (JUnit 5)
+- **수행 도구**: Spring Boot Test (MockMvc)
+- **검증 대상**:
+    - [x] `JwtTokenProviderTest.java`: 토큰 생성, 파싱, 만료 검증 (REQ-U-01)
+    - [x] `FileStorageServiceTest.java`: 파일 저장 및 Path Traversal 방어 (REQ-D-04)
+    - [x] `DocumentIntegrationTest.java`: 문서 CRUD API 및 DB 연동 (UC-D-02)
+- **결과**: **PASS** (2026-03-08)
 
 ---
 
