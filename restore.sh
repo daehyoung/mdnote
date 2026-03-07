@@ -41,10 +41,17 @@ else
         echo -e "${YELLOW}데이터베이스를 복구하면 현재 데이터가 덮어씌워집니다. 진행하시겠습니까? (y/n)${NC}"
         read -p "> " confirm
         if [[ "$confirm" =~ ^[Yy]$ ]]; then
-            echo -e "${BLUE}Cleaning up existing schema...${NC}"
-            docker exec -i "$DB_CONTAINER" psql -U "$DB_USER" -d "$DB_NAME" -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+            echo -e "${BLUE}Cleaning up and recreating schema...${NC}"
+            # public 스키마를 삭제 후 확실하게 다시 생성하고 권한 부여
+            docker exec -i "$DB_CONTAINER" psql -U "$DB_USER" -d "$DB_NAME" <<EOF
+DROP SCHEMA IF EXISTS public CASCADE;
+CREATE SCHEMA public;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO public;
+EOF
             
             echo -e "${BLUE}Restoring Database...${NC}"
+            # --quiet 옵션과 함께 실행하여 불필요한 메시지 억제 및 안정성 확보
             gunzip -c "$SELECTED_DB" | docker exec -i "$DB_CONTAINER" psql -U "$DB_USER" -d "$DB_NAME"
             if [ $? -eq 0 ]; then
                 echo -e "${GREEN}Database restore successful.${NC}"
