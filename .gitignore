@@ -2,3 +2,5 @@
 .DS_Store
 *.log
 .aider*
+backups
+
