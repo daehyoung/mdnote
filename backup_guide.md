@@ -30,8 +30,14 @@ chmod +x restore.sh
 If you prefer to do it manually:
 
 #### Database Restore
+> [!IMPORTANT]
+> 기존 데이터가 있는 경우 테이블 중복 에러가 발생할 수 있습니다. 먼저 스키마를 초기화하는 것이 좋습니다.
+
 ```bash
-# Unzip and restore in one pipe
+# 1. 기존 스키마 초기화 (컨테이너 내부 혹은 밖에서)
+docker exec -i md-note_postgres_1 psql -U postgres -d mdnote -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+
+# 2. Unzip and restore in one pipe
 gunzip -c backups/db_mdnote_YYYYMMDD_HHMMSS.sql.gz | docker exec -i md-note_postgres_1 psql -U postgres -d mdnote
 ```
 

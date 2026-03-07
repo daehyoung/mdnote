@@ -41,6 +41,9 @@ else
         echo -e "${YELLOW}데이터베이스를 복구하면 현재 데이터가 덮어씌워집니다. 진행하시겠습니까? (y/n)${NC}"
         read -p "> " confirm
         if [[ "$confirm" =~ ^[Yy]$ ]]; then
+            echo -e "${BLUE}Cleaning up existing schema...${NC}"
+            docker exec -i "$DB_CONTAINER" psql -U "$DB_USER" -d "$DB_NAME" -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+            
             echo -e "${BLUE}Restoring Database...${NC}"
             gunzip -c "$SELECTED_DB" | docker exec -i "$DB_CONTAINER" psql -U "$DB_USER" -d "$DB_NAME"
             if [ $? -eq 0 ]; then
