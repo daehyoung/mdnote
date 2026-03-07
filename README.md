@@ -13,6 +13,7 @@
 5. **[종합 테스트 계획서 (`05_test_plan.md`)](./docs/05_test_plan.md)**: 프론트/백엔드 단위(Unit) 및 통합(E2E/Integration) 테스트 케이스 전략 가이드.
 6. **[통합 배포 설계서 (`06_deployment_plan.md`)](./docs/06_deployment_plan.md)**: Nginx, Spring Boot, PostgreSQL의 Docker 컨테이너 구성(`docker-compose`) 및 실행 스크립트 모음.
 7. **[요구사항 추적 매트릭스(RTM) (`07_traceability_matrix.md`)](./docs/07_traceability_matrix.md)**: 요구사항(REQ)부터 유스케이스(UC), 프론트엔드 화면(UI 요소), 백엔드 API 엔드포인트까지의 양방향 기능 추적 및 맵핑 테이블.
+8. **[이슈 트래커 (`08_issue_tracker.md`)](./docs/08_issue_tracker.md)**: 관리되고 있는 결함(Bug) 및 품질 개선 사항의 통합 추적 리포트.
 
 ---
 

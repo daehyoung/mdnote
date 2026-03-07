@@ -40,8 +40,8 @@ public class FileStorageService {
         String fileName = UUID.randomUUID().toString() + extension;
 
         try {
-            if (fileName.contains("..")) {
-                throw new RuntimeException("Sorry! Filename contains invalid path sequence " + fileName);
+            if (originalFileName != null && originalFileName.contains("..")) {
+                throw new RuntimeException("Sorry! Filename contains invalid path sequence " + originalFileName);
             }
 
             Path targetLocation = this.fileStorageLocation.resolve(fileName);

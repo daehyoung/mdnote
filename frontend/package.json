@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test:unit": "vitest",
     "test:e2e": "cypress open",
     "test:e2e:headless": "cypress run"
   },
@@ -25,6 +26,7 @@
     "vuetify": "^3.3.0"
   },
   "devDependencies": {
+    "@pinia/testing": "^1.0.3",
     "@vitejs/plugin-vue": "^4.2.0",
     "@vue/test-utils": "^2.4.6",
     "cypress": "^15.7.1",

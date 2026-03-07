@@ -17,7 +17,7 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     public User registerUser(User user) {
-        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -36,7 +36,7 @@ public class UserService {
 
     public void resetPassword(Long id, String newPassword) {
         userRepository.findById(id).map(user -> {
-            user.setPasswordHash(passwordEncoder.encode(newPassword));
+            user.setPassword(passwordEncoder.encode(newPassword));
             return userRepository.save(user);
         }).orElseThrow(() -> new RuntimeException("User not found"));
     }

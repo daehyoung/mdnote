@@ -21,3 +21,7 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+cypress/screenshots
+cypress/videos
+test_output*.txt
+e2e_output*.txt

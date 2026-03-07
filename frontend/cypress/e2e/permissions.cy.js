@@ -190,4 +190,49 @@ describe('Document Permissions Grannular', () => {
          
          logout();
     });
+
+    it('Group Read/Write = True allows member of SAME department', () => {
+        // Setup departmental users via API
+        login(admin.user, admin.pass);
+        cy.window().then(win => {
+            const token = win.localStorage.getItem('token');
+            const auth = { Authorization: `Bearer ${token}` };
+            
+            // 1. Create Department Eng (or get)
+            cy.request({ method: 'POST', url: '/api/admin/departments', headers: auth, body: { name: 'Engineering' }, failOnStatusCode: false }).then(resp => {
+                const deptId = resp.status === 201 ? resp.body.id : 1; // Fallback or find
+                
+                // 2. Assign 'test' and 'user2' to Engineering
+                cy.request({ method: 'GET', url: '/api/admin/users', headers: auth }).then(uResp => {
+                    const testUser = uResp.body.find(u => u.username === 'test');
+                    const user2 = uResp.body.find(u => u.username === 'user2');
+                    
+                    if(testUser) cy.request({ method: 'PUT', url: `/api/admin/users/${testUser.id}`, headers: auth, body: { ...testUser, departmentId: deptId } });
+                    if(user2) cy.request({ method: 'PUT', url: `/api/admin/users/${user2.id}`, headers: auth, body: { ...user2, departmentId: deptId } });
+                });
+            });
+        });
+        logout();
+
+        login('test', 'test');
+        cy.get('[data-test="mode-edit"]').click({ force: true });
+        cy.contains('New Document').click();
+        cy.get('#title-input').clear().type('Group Test Doc');
+        cy.get('#content-editor').type('Secret Eng Content');
+        
+        // Disable Public, Enable Group Read/Write (usually default for Group Read is T)
+        cy.contains('Permissions').click();
+        cy.get('input[aria-label="Read"]').eq(1).parent().click(); // Toggle Public Read OFF
+        cy.get('input[aria-label="Write"]').eq(0).parent().click(); // Toggle Group Write ON
+        cy.contains('Save').click();
+        logout();
+
+        // User2 (Same Dept) should see and edit
+        login('user2', 'password');
+        cy.get('[data-test="mode-edit"]').click({ force: true });
+        cy.contains('Group Test Doc').click();
+        cy.get('[data-test="edit-document-button"]').click({ force: true });
+        cy.get('[data-test="save-button"]').should('exist');
+        logout();
+    });
 });

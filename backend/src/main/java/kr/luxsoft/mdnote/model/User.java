@@ -19,9 +19,9 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
 
-    @com.fasterxml.jackson.annotation.JsonIgnore
-    @Column(nullable = false)
-    private String passwordHash;
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
+    @Column(name = "password_hash", nullable = false)
+    private String password;
 
     private String email;
     private String name;
@@ -40,18 +40,5 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
 
-    // JSON compatibility for "password" field
-    public void setPassword(String password) {
-        this.passwordHash = password;
-    }
-
-    @com.fasterxml.jackson.annotation.JsonIgnore
-    public String getPassword() {
-        return this.passwordHash;
-    }
 }

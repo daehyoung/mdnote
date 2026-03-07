@@ -52,7 +52,7 @@
                         <v-divider vertical class="mx-2 hidden-md-and-down"></v-divider>
 
                         <!-- Updated Date -->
-                        <span class="text-caption text-grey hidden-sm-and-down" style="white-space: nowrap;">
+                        <span v-if="documentStore.currentDocument?.updatedAt" class="text-caption text-grey hidden-sm-and-down" style="white-space: nowrap;">
                             {{ new Date(documentStore.currentDocument.updatedAt).toLocaleDateString() }}
                         </span>
                     </div>

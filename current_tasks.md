@@ -7,14 +7,15 @@
 - `frontend/src/views/HomeView.vue`
 
 ## [Context Summary]
-- Vue 3 및 Spring Boot 백엔드의 기능/UI/배포 문서화를 완료함 (`01~06` 문서).
-- 요구사항-유스케이스-화면단 간의 식별 및 추적성 확보를 위해 **요구사항 추적 매트릭스(RTM)** 문서화 작업을 진행함.
+- **[Test Plan Update]**: 일반화된 테스트 전략([.test_strategy.md](file:///Users/daehyoung/ws/md-note/docs/.test_strategy.md))을 바탕으로 제품별 테스트 계획([05_test_plan.md](file:///Users/daehyoung/ws/md-note/docs/05_test_plan.md))을 구체화(보안 시나리오 추가 등) 완료.
+- **[Documentation]**: 이슈 트래커 연동 및 역할 기반 품질 관리 절차를 공식화함.
 
 ## [Next Step]
-- 요구사항 ID, 유스케이스 ID, UI ID, 백엔드 API 간의 1:N 추적성을 정의하는 RTM 설계서(`docs/07_traceability_matrix.md`) 및 기존 유스케이스 문서(`docs/usecases.md`) ID 교정 작업 수행.
+- 프론트엔드 단위 및 E2E 테스트 시나리오 보강 및 실행.
 
-## [Task List]
-- [x] 백엔드 모듈 및 구조 분석 및 문서화 완료
+- [x] 도커 및 실제 DB 기반- [x] 프론트엔드 테스트 강화 (Vitest/Cypress)
+- [ ] 백엔드 성능 최적화 (Next Phase)
+분석 및 문서화 완료
 - [x] 불일치 문서(`api-design`, `ui-design` 등) 교정 완료
 - [x] `docs/04_frontend_ui_manual.md` 프론트엔드 화면 기술서 작성 
 - [x] `docs/05_test_plan.md` 종합 테스트 계획 및 설계서 작성 (Backend/Frontend 단위 및 통합 테스트 포함)

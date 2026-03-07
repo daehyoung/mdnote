@@ -47,7 +47,7 @@ public class DocumentIntegrationTest {
         if (userRepository.findByUsername("testuser").isEmpty()) {
             kr.luxsoft.mdnote.model.User user = new kr.luxsoft.mdnote.model.User();
             user.setUsername("testuser");
-            user.setPasswordHash("dummy"); // not used by mock user
+            user.setPassword("dummy"); // not used by mock user
             userRepository.save(user);
         }
     }
@@ -115,7 +115,7 @@ public class DocumentIntegrationTest {
         if (userRepository.findByUsername("user1").isEmpty()) {
             user1 = new kr.luxsoft.mdnote.model.User();
             user1.setUsername("user1");
-            user1.setPasswordHash("pass");
+            user1.setPassword("pass");
             user1.setRole("USER");
             userRepository.save(user1);
         } else {
@@ -136,7 +136,7 @@ public class DocumentIntegrationTest {
         if (userRepository.findByUsername("admin").isEmpty()) {
              kr.luxsoft.mdnote.model.User admin = new kr.luxsoft.mdnote.model.User();
              admin.setUsername("admin");
-             admin.setPasswordHash("pass");
+             admin.setPassword("pass");
              admin.setRole("ADMIN");
              userRepository.save(admin);
         }
@@ -148,5 +148,40 @@ public class DocumentIntegrationTest {
         
         // 4. Cleanup
         documentRepository.delete(privateDoc);
+    }
+
+    @Test
+    @WithMockUser(username = "testuser")
+    public void testLifecycleFiltering() throws Exception {
+        // [TS-PER-02] [UC-D-02]
+        // 1. Create DRAFT Document
+        Document draftDoc = new Document();
+        draftDoc.setTitle("Draft Secret");
+        draftDoc.setStatus("DRAFT");
+        draftDoc.setPublicRead(true); 
+        
+        mockMvc.perform(post("/api/documents")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(draftDoc)))
+                .andExpect(status().isCreated());
+
+        // 2. Create PUBLISHED Document
+        Document pubDoc = new Document();
+        pubDoc.setTitle("Published News");
+        pubDoc.setStatus("PUBLISHED");
+        pubDoc.setPublicRead(true);
+        
+        mockMvc.perform(post("/api/documents")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(pubDoc)))
+                .andExpect(status().isCreated());
+
+        // 3. Search as Guest (Filter for PUBLISHED)
+        mockMvc.perform(get("/api/documents")
+                .param("status", "PUBLISHED")
+                .param("query", "Published News"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].title").value("Published News"))
+                .andExpect(jsonPath("$.content[?(@.title == 'Draft Secret')]").doesNotExist());
     }
 }

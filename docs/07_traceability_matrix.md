@@ -9,15 +9,17 @@
 | Req ID | 요구사항 명(기능) | Use Case ID | Frontend 화면 뷰 | 주 사용 요소(UI ID) | Backend API | Backend 모듈 (02_feature) | 비고 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **REQ-U-01** | 사용자 로그인 | `UC-U-01` | `LoginView.vue` | `#btn-login` | `POST /api/v1/auth/login` | `AuthController.login()` | JWT 토큰 발급 |
-| **REQ-U-02** | 내 정보 관리 | `UC-U-02` | `ProfileModal` | Name, Email 필드 | `PUT /api/v1/users/me` | `ProfileController` | 회원 정보 수정 |
+| **REQ-U-02** | 내 정보 관리 | `UC-U-02` | `ProfileView.vue` | `#btn-profile` | `PUT /api/v1/users/me` | `ProfileController` | 회원 정보 수정 |
 | **REQ-U-03** | 사용자 관리 (어드민) | `UC-A-01` | `UserManageView.vue` | 툴바, `#btn-add-user` | `POST /api/v1/users` | `AdminController` | Admin Role 권한 필수 |
-| **REQ-D-01** | 문서 생성/저장 | `UC-D-02` | `DocumentEditView` | `#btn-save`, Markdown 에디터 | `POST /api/v1/documents` <br> `PUT /api/v1/documents/{id}` | `DocumentController` <br> (`create`/`update`) | Status(DRAFT 등) 동시 제어 |
-| **REQ-D-01** | 문서 삭제 | `UC-D-02` | `DocumentEditView` | `#btn-del-doc` | `DELETE /api/v1/documents/{id}` | `DocumentController.delete()` | 본인 작성 문서 혹은 Admin |
+| **REQ-U-04** | 조직/부서 관리 | `UC-A-04` | `OrganizationView.vue` | 트리 아이템 | `POST/PUT /api/v1/departments` | `DepartmentController` | 시스템 조직 계층도 관리 |
+| **REQ-D-01** | 문서 생성/저장 | `UC-D-02` | `DocumentEditView.vue` | `#btn-save`, Markdown 에디터 | `POST /api/v1/documents` <br> `PUT /api/v1/documents/{id}` | `DocumentController` <br> (`create`/`update`) | Status(DRAFT 등) 동시 제어 |
+| **REQ-D-01** | 문서 삭제 | `UC-D-02` | `DocumentEditView.vue` | `#btn-del-doc` | `DELETE /api/v1/documents/{id}` | `DocumentController.delete()` | 본인 작성 문서 혹은 Admin |
 | **REQ-D-02** | 문서 목록 뷰어 | `UC-D-01` | `HomeView.vue` | `#list-item-doc`, `#pagination` | `GET /api/v1/documents` | `DocumentController.getAll...` | PUBLISHED 문서 조회 중심 |
 | **REQ-D-02** | 목록 검색/태그 필터 | `UC-D-04` | `HomeView.vue` | `#input-search`, `#sel-status` | `GET /api/v1/documents?search=...` | `DocumentController` | Query Parameter 전송 |
-| **REQ-D-03** | 문서 접근 권한 제어 | `UC-D-03` | `DocumentDetailView` | 퍼미션 아이콘(Badge) | `GET /api/v1/documents/{id}` | `DocumentService` (권한 로직) | 백엔드가 DB 권한 플래그 검증 후 403 / 200 반환 |
-| **REQ-D-04** | 첨부 파일 스토리지 | `UC-D-02` | `DocumentEditView` <br> (Settings Drawer) | `#btn-attach` | `POST /api/v1/attachments/upload` | `AttachmentController` | 로컬 볼륨 마운트 연계 방식 |
-| **REQ-CM-01** | 문서 댓글 대화 | `UC-D-03` | `DocumentDetailView` | `#input-comment`, `#btn-post-comment` | `POST /api/v1/comments` | `CommentController` | `Allow Comments` 설정 켜져있을 시 |
+| **REQ-D-03** | 문서 접근 권한 제어 | `UC-D-03` | `DocumentDetailView.vue` | 퍼미션 아이콘(Badge) | `GET /api/v1/documents/{id}` | `DocumentService` (권한 로직) | 백엔드 권한 필터 검증 |
+| **REQ-D-04** | 첨부 파일 스토리지 | `UC-D-02` | `DocumentEditView.vue` <br> (Settings Drawer) | `#btn-attach` | `POST /api/v1/attachments/upload` | `AttachmentController` | 멀티파트 파일 업로드 |
+| **REQ-C-01/02** | 카테고리 관리 | `UC-A-03` | `CategoryManageView.vue` | 트리 아이템, CRUD 팝업 | `POST/PUT /api/v1/categories` | `CategoryController` | 시스템 공통 카테고리 트리 |
+| **REQ-CM-01** | 문서 댓글 대화 | `UC-D-03` | `DocumentDetailView.vue` | `#input-comment`, `#btn-post-comment` | `POST /api/v1/comments` | `CommentController` | `Allow Comments` 설정 연동 |
 
 ---
 

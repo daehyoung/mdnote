@@ -51,7 +51,7 @@ public class DataInitializer implements CommandLineRunner {
         if (userRepository.findByUsername(username).isEmpty()) {
             User user = new User();
             user.setUsername(username);
-            user.setPasswordHash(passwordEncoder.encode(password));
+            user.setPassword(passwordEncoder.encode(password));
             user.setName(username); // Set name as username for simplicity
             user.setRole(role);
             user.setStatus("ACTIVE");

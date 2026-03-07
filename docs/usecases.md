@@ -74,25 +74,35 @@
     *   Filters on left: Date Range, Author, Tag.
 5.  **User** clicks a result to view.
 
+### 2.5 File Attachment (`UC-D-05`)
+**Actor**: Author
+1.  **Author** clicks "Attach File" (paperclip icon) in the Document Edit View.
+2.  **System** opens file picker.
+3.  **Author** selects a file (e.g., `image.png`, `pdf`).
+4.  **System** uploads file via API `POST /api/attachments/upload`.
+5.  **System** returns metadata (ID, Original Name, Size) and displays it in the "Attachments" list.
+6.  **Author** saves the document, and the system links the attachment to the document via `doc_id`.
+7.  **System** allows users with Read permission to download the file via `GET /api/attachments/:id`.
+
 ## 3. System Administration
 
 ### 3.1 User Management (`UC-A-01`)
 **Actor**: Admin
-1.  **Admin** navigates to `/admin/users`.
-2.  **System** displays **User List** table.
-    *   Columns: Username, Name, Department, Role, Status, Actions.
-3.  **Admin** clicks "Add User".
-4.  **System** shows **Create User Modal**.
-    *   Fields: Username, Password, Name, Email, Department (Tree Select), Role (Select).
-5.  **Admin** fills form and saves.
-6.  **System** creates user `POST /users` (Admin API).
-7.  **System** refreshes list.
+1.  **Admin** navigates to User Management Page.
+2.  **System** fetches user list via `GET /api/admin/users`.
+3.  **Admin** can search users by username or filter by department.
+4.  **Admin** changes a user's role (USER -> ADMIN) or status (ACTIVE -> INACTIVE) via `PUT /api/admin/users/{id}/status`.
+5.  **Admin** creates a new user via `POST /api/admin/users`.
+6.  **System** persists the user and triggers an email/notification (if configured).
 
-### 3.2 System Settings (`UC-A-02`)
+### 3.2 Category Management (`UC-A-03`)
 **Actor**: Admin
-1.  **Admin** navigates to `/admin/settings`.
-2.  **System** displays configuration form.
-    *   Site Name.
-    *   Allow Registration (Yes/No).
-    *   Default Language.
-3.  **Admin** changes settings and clicks "Save".
+1.  **Admin** opens Category Management View.
+2.  **System** displays the full hierarchy.
+3.  **Admin** adds a new system-level category via `POST /api/categories`.
+4.  **System** refreshes the tree for all users.
+
+### 3.3 Dashboard Metrics (`UC-A-05`)
+**Actor**: Admin
+1.  **Admin** views the System Overview dashboard.
+2.  **System** displays statistics: Total Users, Documents, Storage used.

@@ -184,8 +184,8 @@
 #### 🔌 API 연동 규격표 (Document Detail)
 | Req ID | Use Case ID | 기능 / 요소 ID | HTTP Method | API Endpoint | Request / Payload | Response | Description |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **REQ-D-02** | `UC-D-03` | **문서 상세 조회** <br> (화면 진입 시점) | `GET` | `/api/v1/documents/{id}` | Path Variable: `id` | `200 OK` <br> `Document` 객체 | 마크다운 본문 및 메타데이터, 작성자 정보를 포함해 응답 |
-| **REQ-CM-01**| `UC-D-03` | **댓글 목록 조회** | `GET` | `/api/v1/comments?documentId={id}` | Query Params 필요 | `200 OK` <br> 댓글 배열 | 해당 문서에 달린 댓글 리스트 조회 (향후 엔드포인트 구체화 필요) |
+| **REQ-D-03** | `UC-D-03` | **문서 상세 조회** <br> (화면 진입 시점) | `GET` | `/api/v1/documents/{id}` | Path Variable: `id` | `200 OK` <br> `Document` 객체 | 마크다운 본문 및 메타데이터, 작성자 정보를 포함해 응답 |
+| **REQ-CM-01**| `UC-D-03` | **댓글 목록 조회** | `GET` | `/api/v1/comments?documentId={id}` | Query Params 필요 | `200 OK` <br> 댓글 배열 | 해당 문서에 달린 댓글 리스트 조회 |
 | **REQ-CM-01**| `UC-D-03` | **댓글 작성** <br> `#btn-post-comment` | `POST` | `/api/v1/comments` | `{ "documentId": {id}, "content": "..." }` | `201 Created` | 입력한 내용을 댓글 엔티티로 생성 |
 | **REQ-CM-01**| `UC-D-03` | **댓글 삭제** <br> `#btn-del-comment` | `DELETE` | `/api/v1/comments/{commentId}` | Path Variable: `commentId` | `204 No Content` | 본인이 작성한 댓글 영구 삭제 |
 

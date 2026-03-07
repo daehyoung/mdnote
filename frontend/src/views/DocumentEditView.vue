@@ -18,6 +18,7 @@
                         density="compact"
                         style="max-width: 400px;" 
                         id="title-input"
+                        data-test="title-input"
                     ></v-text-field>
                     
                     <v-spacer></v-spacer>
@@ -25,7 +26,7 @@
                     <v-btn color="success" text @click="saveDocument" :disabled="!isDirty" class="mr-2" data-test="save-button">
                         Save
                     </v-btn>
-                    <v-btn color="error" icon @click="deleteDocument" v-if="canDelete">
+                    <v-btn color="error" icon @click="deleteDocument" v-if="canDelete" data-test="delete-button">
                         <v-icon>mdi-delete</v-icon>
                     </v-btn>
                     <input type="file" ref="fileInput" style="display: none" @change="handleFileUpload" id="file-input" />

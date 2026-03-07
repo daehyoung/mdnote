@@ -56,7 +56,7 @@ public class ProfileController {
 
         return userRepository.findByUsername(username)
                 .map(user -> {
-                    user.setPasswordHash(passwordEncoder.encode(newPassword));
+                    user.setPassword(passwordEncoder.encode(newPassword));
                     userRepository.save(user);
                     return ResponseEntity.ok().<Void>build();
                 })

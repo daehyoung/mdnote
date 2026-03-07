@@ -31,7 +31,7 @@ public class UserServiceTest {
     public void testRegisterUser() {
         User user = new User();
         user.setUsername("testuser");
-        user.setPasswordHash("password");
+        user.setPassword("password");
 
         when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
@@ -43,7 +43,7 @@ public class UserServiceTest {
         User registeredUser = userService.registerUser(user);
 
         assertNotNull(registeredUser.getId());
-        assertEquals("encodedPassword", registeredUser.getPasswordHash());
+        assertEquals("encodedPassword", registeredUser.getPassword());
         verify(userRepository).save(any(User.class));
     }
 
