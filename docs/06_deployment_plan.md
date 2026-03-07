@@ -178,7 +178,15 @@ volumes:
 
 위에서 정의한 `docker-compose.yml` 리소스를 활용하여 실제 서버 혹은 로컬 PC에 시스템을 띄우고 내리는 명령어 모음입니다.
 
-### 6.1 환경변수 세팅
+### 6.1 서버 환경 준비 (Ubuntu Firewall)
+우분투 서버에서 서비스를 운영할 경우 필요한 포트를 개방해야 합니다. 루트 디렉터리의 `setup_firewall.sh`를 사용하십시오.
+```bash
+chmod +x setup_firewall.sh
+sudo ./setup_firewall.sh
+```
+**개방 포트**: 80, 443, 3000(Frontend), 8080(Backend)
+
+### 6.2 환경변수 세팅
 프로젝트 최상단(루트) 디렉터리에 `.env` 파일을 먼저 생성해야 합니다.
 ```bash
 # .env 파일 생성 및 예시 (Linux/Mac 환경)
