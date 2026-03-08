@@ -1,9 +1,19 @@
 # 04 프론트엔드 화면 기술서 및 매뉴얼
 
 ## 1. 개요 (Overview)
-본 문서는 MarkDown Note System 프로젝트의 프론트엔드(Vue 3 + Vuetify) 구현체를 기반으로 작성된 상세 화면 기술서 및 사용자 매뉴얼입니다. 개발된 Vue 컴포넌트(`src/views/*`)와 라우팅 구조(`src/router/index.js`)를 1:1로 매핑하여 시스템의 실제 사용자 인터페이스 동작을 정의합니다. 각 화면별 **와이어프레임(Wireframe)**과 화면 요소별 **ID**를 기입하여 요소와 기능 설명을 연결하였습니다.
+본 문서는 MarkDown Note System 프로젝트의 프론트엔드(Vue 3 + Vuetify) 구현체를 기반으로 작성된 상세 화면 기술서 및 사용자 매뉴얼입니다. 디자인 시스템의 핵심 철학인 **Clean, Modern, Professional** 감성을 바탕으로 다크 모드를 지원하며, Vuetify(Material Design) 프레임워크를 활용하여 일관된 사용자 경험을 제공합니다.
 
-## 2. 공통 레이아웃 (Layout & Navigation)
+## 2. 디자인 컨셉 & 전략 (Design Concept & Strategy)
+시스템의 전반적인 시각적 언어와 인터페이스 구성 원칙은 다음과 같습니다.
+
+*   **Design Theme**: 업무 효율을 극대화하기 위해 여백과 타이포그래피를 강조한 모던한 디자인을 지향합니다. (Light/Dark 모드 지원)
+*   **프레임워크**: Vue 3와 Vuetify를 결합하여 견고한 컴포넌트 기반 아키텍처를 구축하였습니다.
+*   **레이아웃 대원칙**: 
+    - **Sidebar (내비게이션 서랍)**: 조직 및 카테고리 트리 구조를 통한 직관적인 문서 탐색 환경 제공.
+    - **Header (앱 바)**: 검색, 사용자 프로필, 알림 등 전역 기능을 고정 배치.
+    - **Main Content**: 문서 열람 및 고도화된 마크다운 에디터 환경을 메인 영역에 집중 배치.
+
+## 3. 공통 레이아웃 (Layout & Navigation)
 모든 주요 기능 화면은 `MainLayout.vue`를 공유합니다.
 
 ### 🎨 와이어프레임 & 화면 컴포넌트 트리 (Main Layout)
