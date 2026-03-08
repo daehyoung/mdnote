@@ -126,12 +126,11 @@ sudo ./setup_firewall.sh
 
 
 ---
-## 작업 가이드 문서(프롬프트)
+## AI 작업 가이드 문서(프롬프트)
 * **[소프트웨어 개발 단계별 역할 및 작업 지시서](./docs/.role_spec.md)**
-* **[테스트 전략 지침](./docs/.test_strategy.md)**
 * **[유스케이스 작성 지침](./docs/.usecase_strategy.md)**
 * **[코드작성 지침](./docs/.coding_rules.md)**
-
+* **[테스트 전략 지침](./docs/.test_strategy.md)**
 ---
 
 ## 🛠 개발 정보 (Development Info)
