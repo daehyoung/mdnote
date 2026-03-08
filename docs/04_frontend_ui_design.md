@@ -278,13 +278,44 @@
 Admin 권한 보유자만 접근 가능한 특권 뷰 리스트(`/admin/*`).
 
 ### 4.1 시스템 사용자 관리 (`UserManageView.vue`)
-* 조직 구성원 리스트를 표(Table)로 모니터링. 역할(Role)이나 비밀번호(Password)를 관리자가 강제 초기화하거나 신규 사용자를 추가합니다.
+*   **컴포넌트 구조**:
+    *   `#user-data-table`: 사용자 목록을 출력하는 서버사이드 페이징 테이블.
+    *   `#btn-add-user`: 신규 사용자 등록 팝업 호출 버튼.
+    *   `#dialog-user-form`: 사용자 정보 입력/수정 팝업.
+    *   `#btn-reset-pw`: 비밀번호 강제 초기화 버튼(각 행의 액션 메뉴 내 위치).
+    *   `#btn-toggle-status`: 사용자 활성/비활성 전환 버튼.
+
+#### 🔌 API 연동 규격표 (User Management)
+| Req ID | Use Case ID | 기능 / 요소 ID | HTTP Method | API Endpoint | Request / Payload | Description |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **REQ-A-01** | `UC-A-01` | **사용자 목록 로드** | `GET` | `/api/admin/users` | `page`, `size` (Query) | 전체 사용자 리스트 페이징 조회 |
+| **REQ-A-01** | `UC-A-01` | **사용자 등록** <br> `#btn-save-user` | `POST` | `/api/admin/users` | `{ "username": "...", "passwordHash": "...", "role": "..." }` | 신규 사용자 생성 및 기본 역할 부여 |
+| **REQ-A-02** | `UC-A-01` | **비밀번호 초기화** <br> `#btn-reset-pw` | `PUT` | `/api/admin/users/{id}/password` | `plain-text` (New Password) | 관리자 권한으로 사용자 비밀번호 강제 변경 |
+| **REQ-A-01** | `UC-A-01` | **상태 변경** <br> `#btn-status` | `PUT` | `/api/admin/users/{id}/status` | `ACTIVE` or `INACTIVE` (String) | 사용자 계정의 로그인 허용 여부 제어 |
 
 ### 4.2 조직도(부서) 관리 (`OrganizationView.vue`)
-* 재귀적 트리 컴포넌트를 사용하여 `Company -> Engineering -> Backend` 와 같은 조직 계층도(Department node)를 트리 형태로 관리합니다.
+*   **컴포넌트 구조**:
+    *   `#org-recursive-list`: 부속 부서를 포함한 재귀적 트리 리스트.
+    *   `#btn-add-root-org`: 최상위 조직(본부 등) 추가 버튼.
+    *   `#dialog-org-form`: 부서명 수정 및 상위 부서 지정을 위한 팝업.
+
+#### 🔌 API 연동 규격표 (Organization)
+| Req ID | Use Case ID | 기능 / 요소 ID | HTTP Method | API Endpoint | Request / Payload | Description |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **REQ-O-01** | `UC-O-01` | **조직 트리 로드** | `GET` | `/api/departments/tree` | - | 전체 조직 계층 구조 조회 |
+| **REQ-O-01** | `UC-O-01` | **조직 생성** | `POST` | `/api/departments` | `{ "name": "...", "parentId": ... }` | 상위 부서 아래에 하위 부서 노드 추가 |
+| **REQ-O-01** | `UC-O-01` | **조직 정보 수정** | `PUT` | `/api/departments/{id}` | `{ "name": "..." }` | 선택된 조직의 명칭 변경 |
 
 ### 4.3 시스템 카테고리 관리 (`CategoryManageView.vue`, Scope: SYSTEM)
-* 사용자의 공통 네비게이션 서랍(`#list-sys-cats`)에 보이는 `System Categories` 트리를 구축/수정합니다.
+*   **컴포넌트 구조**:
+    *   `#cat-recursive-list`: 시스템 공용 카테고리 트리.
+    *   `#btn-add-sys-cat`: 최상위 시스템 카테고리 추가 버튼.
+
+#### 🔌 API 연동 규격표 (System Category)
+| Req ID | Use Case ID | 기능 / 요소 ID | HTTP Method | API Endpoint | Request / Payload | Description |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **REQ-C-01** | `UC-C-01` | **카테고리 트리 로드** | `GET` | `/api/categories/tree` | - | 시스템/사용자 카테고리 트리 통합 조회 |
+| **REQ-C-01** | `UC-C-01` | **카테고리 생성** | `POST` | `/api/categories` | `{ "name": "...", "parentId": ..., "scope": "SYSTEM" }` | 전사 공용 카테고리 노드 추가 |
 
 ## 5. 결론
 와이어프레임과 HTML ID 단위의 설계는 사용자 편의성과 개발 유지보수의 용이성을 보장합니다. 본 문서는 구현된 컴포넌트 이벤트 액션과 정확히 일치하며 마일스톤 확장의 기반 지표가 됩니다.
