@@ -1,26 +1,22 @@
 # Current Tasks
 
 ## [Active Files]
-- backend/src/main/java/kr/luxsoft/mdnote/config/OpenAPIConfig.java
-- backend/src/main/java/kr/luxsoft/mdnote/controller/*
-- docs/worklogs/20260308_api_documentation.md
 - README.md
+- docs/usecases.md
+- docs/.usecase_strategy.md
+- docs/ai-context.md
 
 [Context Summary]
-모든 백엔드 컨트롤러(9개)에 OpenAPI(Swagger) 애노테이션을 추가하여 상세 API 문서화를 완료했습니다. 또한 작업 내용을 아카이빙하고 README.md에 관련 링크를 추가했습니다.
+유스케이스를 가치 중심 목표(Goal)와 대화식 시나리오로 전면 리팩토링하고, 중단점(Interruptible Point) 개념을 통해 기술적 추적성을 확보했습니다. 또한 AI 협업 효율성을 위한 `ai-context.md` 작성 및 README 통합을 완료하여 모든 지식 자산을 저장소에 동기화했습니다.
 
 [Next Step]
-Swagger UI를 통한 API 명세 검토 및 프론트엔드 연동성 확인
+정립된 설계 지침 및 유스케이스 흐름을 바탕으로 신규 기능 개발 또는 QA 시나리오 고도화 진행
 
 [Task List]
-- [x] OpenAPI(Swagger) 기반 API 상세 문서화 (9개 컨트롤러)
-- [x] Swagger UI 내 JWT 인증 연동 설정 확인
-- [x] 작업 로그 아카이빙 및 README.md 업데이트
-- [x] `docs/02_feature_analysis.md` 기능 분석표 API Path 컬럼 추가
-- [x] 전체 시스템 상태 검증 완료
-검증 완료
-- [x] 불일치 문서(`03_db_design.md`, `04_frontend_ui_design.md`, `04_api.yaml`) 교정 및 통합 완료
-- [x] `docs/04_frontend_ui_design.md` 프론트엔드 화면 설계서 작성 
-- [x] `docs/05_test_plan.md` 종합 테스트 계획 및 설계서 작성 (Backend/Frontend 단위 및 통합 테스트 포함)
-- [x] `docs/06_deployment_plan.md` Docker 기반 통합 배포 및 인프라 설계서 작성
-- [x] `docs/07_traceability_matrix.md` 요구사항 추적 매트릭스(RTM) 작성 및 `usecases.md` 고유 ID 교정
+- [x] `docs/usecases.md` 가치 중심(Goal-Oriented) 및 대화식 리팩토링
+- [x] `.usecase_strategy.md` 내 중단점 표기 규격 및 설계 철학 추가
+- [x] `docs/ai-context.md` LLM 컨텍스트 최적화 전략 문서 작성
+- [x] README.md 업데이트 및 기밀 유지용 링크 정리 완료
+- [x] 모든 작업 내역 커밋 및 푸시 (`main` 브랜치)
+- [x] OpenAPI(Swagger) 기반 API 상세 문서화 및 연동 완료
+- [x] 통합 테스트 계획 및 배포 설계서 최신화 완료
