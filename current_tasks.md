@@ -17,6 +17,7 @@ Swagger UI를 통한 API 명세 검토 및 프론트엔드 연동성 확인
 - [x] Swagger UI 내 JWT 인증 연동 설정 확인
 - [x] 작업 로그 아카이빙 및 README.md 업데이트
 - [x] 개발 표준 워크플로우(`.workflow.md`) 수립 및 Git 절차 추가
+- [x] `docs/02_feature_analysis.md` 기능 분석표 API Path 컬럼 추가
 - [x] 전체 시스템 상태 검증 완료
 검증 완료
 - [x] 불일치 문서(`api-design`, `ui-design` 등) 교정 완료
