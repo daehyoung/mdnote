@@ -2,12 +2,16 @@ openapi: 3.0.0
 info:
   title: Markdown Note System API
   version: 1.0.0
-  description: API for Markdown Note System
+  description: API for Markdown Note System. Includes document management, authentication, and administration.
 servers:
-  - url: http://localhost:8080/api/v1
+  - url: http://localhost:8080
+    description: Local development server
+
 paths:
-  /auth/login:
+  /api/v1/auth/login:
     post:
+      tags:
+        - Authentication
       summary: User Login
       requestBody:
         content:
@@ -29,10 +33,74 @@ paths:
                 properties:
                   token:
                     type: string
-  /documents:
+                  theme:
+                    type: string
+
+  /api/documents:
     get:
+      tags:
+        - Documents
       summary: List documents
       parameters:
+        - name: categoryId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: tagName
+          in: query
+          schema:
+            type: string
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: sort
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Paged list of documents
+    post:
+      tags:
+        - Documents
+      summary: Create new document
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Document'
+      responses:
+        '201':
+          description: Created
+
+  /api/documents/search:
+    get:
+      tags:
+        - Documents
+      summary: Search documents by keyword
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
         - name: page
           in: query
           schema:
@@ -43,19 +111,12 @@ paths:
             type: integer
       responses:
         '200':
-          description: List of documents
-    post:
-      summary: Create new document
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Document'
-      responses:
-        '201':
-          description: Created
-  /documents/{id}:
+          description: Search results
+
+  /api/documents/{id}:
     get:
+      tags:
+        - Documents
       summary: Get document by ID
       parameters:
         - name: id
@@ -71,6 +132,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Document'
     put:
+      tags:
+        - Documents
       summary: Update document
       parameters:
         - name: id
@@ -87,6 +150,8 @@ paths:
         '200':
           description: Updated
     delete:
+      tags:
+        - Documents
       summary: Delete document
       parameters:
         - name: id
@@ -96,6 +161,411 @@ paths:
             type: integer
       responses:
         '204':
+          description: Deleted
+
+  /api/documents/{docId}/comments:
+    get:
+      tags:
+        - Comments
+      summary: Get document comments
+      parameters:
+        - name: docId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of comments
+    post:
+      tags:
+        - Comments
+      summary: Add comment
+      parameters:
+        - name: docId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+      responses:
+        '200':
+          description: Comment added
+
+  /api/documents/{docId}/comments/{commentId}:
+    delete:
+      tags:
+        - Comments
+      summary: Delete comment
+      parameters:
+        - name: docId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Deleted
+
+  /api/categories/tree:
+    get:
+      tags:
+        - Categories
+      summary: Get category tree
+      responses:
+        '200':
+          description: Hierarchical tree of categories
+
+  /api/categories:
+    post:
+      tags:
+        - Categories
+      summary: Create category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                parentId:
+                  type: integer
+                scope:
+                  type: string
+      responses:
+        '200':
+          description: Created
+
+  /api/categories/{id}:
+    put:
+      tags:
+        - Categories
+      summary: Update category
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags:
+        - Categories
+      summary: Delete category
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Deleted
+
+  /api/attachments/upload:
+    post:
+      tags:
+        - Attachments
+      summary: Upload file
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Uploaded attachment metadata
+
+  /api/attachments/{id}:
+    get:
+      tags:
+        - Attachments
+      summary: Download file
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: File resource
+    delete:
+      tags:
+        - Attachments
+      summary: Delete attachment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Deleted
+
+  /api/tags:
+    get:
+      tags:
+        - Tags
+      summary: Get all tags with counts
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of tag DTOs
+
+  /api/profile:
+    get:
+      tags:
+        - Profile
+      summary: Get current user profile
+      responses:
+        '200':
+          description: User details
+    put:
+      tags:
+        - Profile
+      summary: Update profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                theme:
+                  type: string
+      responses:
+        '200':
+          description: Updated profile
+
+  /api/profile/password:
+    put:
+      tags:
+        - Profile
+      summary: Update password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Password updated
+
+  /api/admin/users:
+    get:
+      tags:
+        - Administration
+      summary: List all users
+      responses:
+        '200':
+          description: Paged list of users
+    post:
+      tags:
+        - Administration
+      summary: Create new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User created
+
+  /api/admin/users/{id}:
+    put:
+      tags:
+        - Administration
+      summary: Update user info
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags:
+        - Administration
+      summary: Delete user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Deleted
+
+  /api/admin/users/{id}/status:
+    put:
+      tags:
+        - Administration
+      summary: Update user status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: Status updated
+
+  /api/admin/users/{id}/department:
+    put:
+      tags:
+        - Administration
+      summary: Update user department
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: integer
+      responses:
+        '200':
+          description: Department updated
+
+  /api/admin/users/{id}/password:
+    put:
+      tags:
+        - Administration
+      summary: Reset user password
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: Password reset
+
+  /api/departments/tree:
+    get:
+      tags:
+        - Departments
+      summary: Get department tree
+      responses:
+        '200':
+          description: Full organizational hierarchy
+
+  /api/departments:
+    post:
+      tags:
+        - Departments
+      summary: Create department
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                parentId:
+                  type: integer
+      responses:
+        '200':
+          description: Created
+
+  /api/departments/{id}:
+    put:
+      tags:
+        - Departments
+      summary: Update department
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags:
+        - Departments
+      summary: Delete department
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
           description: Deleted
 
 components:
@@ -126,9 +596,28 @@ components:
         tags:
           type: array
           items:
-            type: object
-            properties:
-              id:
-                type: integer
-              name:
-                type: string
+            $ref: '#/components/schemas/Tag'
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+        status:
+          type: string
+        theme:
+          type: string
