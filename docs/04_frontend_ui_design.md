@@ -278,6 +278,36 @@
 Admin 권한 보유자만 접근 가능한 특권 뷰 리스트(`/admin/*`).
 
 ### 4.1 시스템 사용자 관리 (`UserManageView.vue`)
+
+#### 🎨 와이어프레임 & 컴포넌트 트리 (User Management)
+```text
++-------------------------------------------------------------+
+| User Management                            [+ Add User]     |
++-------------------------------------------------------------+
+| ID | Username | Name | Role | Organization | Status | Action |
+|----+----------+------+------+--------------+--------+--------|
+| 1  | admin    | Admin| [ADM]| Engineering  | [ACT]  | [ ⋮ ]  |
+| 2  | test     | User | [USR]| Marketing    | [ACT]  | [ ⋮ ]  |
++-------------------------------------------------------------+
+|                   < 1 2 [3] 4 5 > `#pagination`             |
++-------------------------------------------------------------+
+```
+
+```text
+[Container] UserManageView
+├── [Toolbar] Header
+│   └── [Button] Add User (#btn-add-user)
+├── [Section] Data Table (#user-data-table)
+│   ├── [Chip] Role (ADMIN/MANAGER/USER)
+│   ├── [Chip] Status (ACTIVE/INACTIVE)
+│   └── [Menu] Actions
+│       ├── [Item] Edit User
+│       ├── [Item] Reset Password (#btn-reset-pw)
+│       ├── [Item] Assign Org
+│       └── [Item] Toggle Status (#btn-toggle-status)
+└── [Dialog] User Form (#dialog-user-form)
+```
+
 *   **컴포넌트 구조**:
     *   `#user-data-table`: 사용자 목록을 출력하는 서버사이드 페이징 테이블.
     *   `#btn-add-user`: 신규 사용자 등록 팝업 호출 버튼.
@@ -294,6 +324,30 @@ Admin 권한 보유자만 접근 가능한 특권 뷰 리스트(`/admin/*`).
 | **REQ-A-01** | `UC-A-01` | **상태 변경** <br> `#btn-status` | `PUT` | `/api/admin/users/{id}/status` | `ACTIVE` or `INACTIVE` (String) | 사용자 계정의 로그인 허용 여부 제어 |
 
 ### 4.2 조직도(부서) 관리 (`OrganizationView.vue`)
+
+#### 🎨 와이어프레임 & 컴포넌트 트리 (Organization)
+```text
++-------------------------------------------------------------+
+| Organization Management            [+ Add Root Organization] |
++-------------------------------------------------------------+
+| 🏢 Company Logo                                              |
+|  └── 📂 Engineering                     [✏️] [🗑️] [+]   |
+|       ├── 📂 Backend                    [✏️] [🗑️] [+]   |
+|       └── 📂 Frontend                   [✏️] [🗑️] [+]   |
++-------------------------------------------------------------+
+```
+
+```text
+[Container] OrganizationView
+├── [Toolbar] Header
+│   └── [Button] Add Root (#btn-add-root-org)
+├── [List] Organization Tree (#org-recursive-list)
+│   └── [Component] RecursiveOrganizationList
+│       ├── [Icon] Folder/Building
+│       └── [Group] Row Actions (Edit, Delete, Add Child)
+└── [Dialog] Org Form (#dialog-org-form)
+```
+
 *   **컴포넌트 구조**:
     *   `#org-recursive-list`: 부속 부서를 포함한 재귀적 트리 리스트.
     *   `#btn-add-root-org`: 최상위 조직(본부 등) 추가 버튼.
@@ -307,6 +361,27 @@ Admin 권한 보유자만 접근 가능한 특권 뷰 리스트(`/admin/*`).
 | **REQ-O-01** | `UC-O-01` | **조직 정보 수정** | `PUT` | `/api/departments/{id}` | `{ "name": "..." }` | 선택된 조직의 명칭 변경 |
 
 ### 4.3 시스템 카테고리 관리 (`CategoryManageView.vue`, Scope: SYSTEM)
+
+#### 🎨 와이어프레임 & 컴포넌트 트리 (System Category)
+```text
++-------------------------------------------------------------+
+| System Category Management             [+ Add Root Category]|
++-------------------------------------------------------------+
+| 📁 Standard Operating Procedures (SOP)     [✏️] [🗑️] [+]   |
+|  ├── 📁 Security Guidelines                [✏️] [🗑️] [+]   |
+|  └── 📁 Onboarding Process                 [✏️] [🗑️] [+]   |
++-------------------------------------------------------------+
+```
+
+```text
+[Container] CategoryManageView
+├── [Toolbar] Header
+│   └── [Button] Add Root (#btn-add-sys-cat)
+├── [List] Category Tree (#cat-recursive-list)
+│   └── [Component] RecursiveCategoryList
+│       └── [Group] Actions (Edit, Delete, Add Child)
+```
+
 *   **컴포넌트 구조**:
     *   `#cat-recursive-list`: 시스템 공용 카테고리 트리.
     *   `#btn-add-sys-cat`: 최상위 시스템 카테고리 추가 버튼.
