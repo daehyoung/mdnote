@@ -20,8 +20,8 @@ Swagger UI를 통한 API 명세 검토 및 프론트엔드 연동성 확인
 - [x] `docs/02_feature_analysis.md` 기능 분석표 API Path 컬럼 추가
 - [x] 전체 시스템 상태 검증 완료
 검증 완료
-- [x] 불일치 문서(`api-design`, `ui-design` 등) 교정 완료
-- [x] `docs/04_frontend_ui_manual.md` 프론트엔드 화면 기술서 작성 
+- [x] 불일치 문서(`03_db_design.md`, `04_frontend_ui_design.md`, `04_api.yaml`) 교정 및 통합 완료
+- [x] `docs/04_frontend_ui_design.md` 프론트엔드 화면 설계서 작성 
 - [x] `docs/05_test_plan.md` 종합 테스트 계획 및 설계서 작성 (Backend/Frontend 단위 및 통합 테스트 포함)
 - [x] `docs/06_deployment_plan.md` Docker 기반 통합 배포 및 인프라 설계서 작성
 - [x] `docs/07_traceability_matrix.md` 요구사항 추적 매트릭스(RTM) 작성 및 `usecases.md` 고유 ID 교정

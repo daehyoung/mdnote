@@ -10,11 +10,12 @@
 2. **[기능 분석표 (`02_feature_analysis.md`)](./docs/02_feature_analysis.md)**: 백엔드 모듈 구조 및 컨트롤러-기능 맵핑 분석.
 3. **[시스템 아키텍처 설계 (`03_architecture.md`)](./docs/03_architecture.md)**: 기술 스택, 인증(Security) 전략, 데이터베이스 설계 사상 도식화.
 4. **[데이터베이스 설계서 (`03_db_design.md`)](./docs/03_db_design.md)**: 데이터베이스 스키마(ERD), 테이블 정의 및 SQL 스크립트.
-4. **[프론트엔드 화면 기술서 (`04_frontend_ui_manual.md`)](./docs/04_frontend_ui_manual.md)**: 각 화면(뷰)의 와이어프레임(객체 트리) 구조 및 버튼 요소-API 엔드포인트 연동 규격 상세 리스트.
-5. **[종합 테스트 계획서 (`05_test_plan.md`)](./docs/05_test_plan.md)**: 프론트/백엔드 단위(Unit) 및 통합(E2E/Integration) 테스트 케이스 전략 가이드.
-6. **[통합 배포 설계서 (`06_deployment_plan.md`)](./docs/06_deployment_plan.md)**: Nginx, Spring Boot, PostgreSQL의 Docker 컨테이너 구성(`docker-compose`) 및 실행 스크립트 모음.
-7. **[요구사항 추적 매트릭스(RTM) (`07_traceability_matrix.md`)](./docs/07_traceability_matrix.md)**: 요구사항(REQ)부터 유스케이스(UC), 프론트엔드 화면(UI 요소), 백엔드 API 엔드포인트까지의 양방향 기능 추적 및 맵핑 테이블.
-8. **[이슈 트래커 (`08_issue_tracker.md`)](./docs/08_issue_tracker.md)**: 관리되고 있는 결함(Bug) 및 품질 개선 사항의 통합 추적 리포트.
+4. **[프론트엔드 화면 설계서 (`04_frontend_ui_design.md`)](./docs/04_frontend_ui_design.md)**: 각 화면(뷰)의 와이어프레임(객체 트리) 구조 및 버튼 요소-API 엔드포인트 연동 규격 상세 리스트.
+5. **[API 설계서 (`04_api.yaml`)](./docs/04_api.yaml)**: OpenAPI(Swagger) 규격에 맞춘 백엔드 인터페이스 정의서.
+6. **[종합 테스트 계획서 (`05_test_plan.md`)](./docs/05_test_plan.md)**: 프론트/백엔드 단위(Unit) 및 통합(E2E/Integration) 테스트 케이스 전략 가이드.
+7. **[통합 배포 설계서 (`06_deployment_plan.md`)](./docs/06_deployment_plan.md)**: Nginx, Spring Boot, PostgreSQL의 Docker 컨테이너 구성(`docker-compose`) 및 실행 스크립트 모음.
+8. **[요구사항 추적 매트릭스 (`07_traceability_matrix.md`)](./docs/07_traceability_matrix.md)**: 요구사항-화면-API 간의 연관 관계 맵핑 및 추적성 확보.
+9. **[이슈 트래커 (`08_issue_tracker.md`)](./docs/08_issue_tracker.md)**: 개발 중 발견된 결함 및 개선 사항 히스토리 관리.
 9. **[작업 로그 (Work Logs)](./docs/worklogs/)**: 구현 단계별 기술 의사결정 및 상세 작업 내역 아카이브.
     - [2026-03-08: API 문서화 (OpenAPI/Swagger) 도입 - 계획](./docs/worklogs/20260308_api_documentation.md) / [결과](./docs/worklogs/20260308_api_documentation_walkthrough.md)
 

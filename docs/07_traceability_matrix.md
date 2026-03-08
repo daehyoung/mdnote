@@ -28,7 +28,7 @@
 
 - `01_requirements.md` (What to build?) ➔ `Req ID` 부여.
 - `usecases.md` (How users interact?) ➔ `UC ID` 부여.
-- `04_frontend_ui_manual.md` (Where users click?) ➔ `UI ID (#btn-xxx)` 부여 및 API 매핑.
-- `06_deployment_plan.md` & `api.yml` (How backend serves?) ➔ `Backend API` 엔드포인트 매핑.
+- `04_frontend_ui_design.md` (Where users click?) ➔ `UI ID (#btn-xxx)` 부여 및 API 매핑.
+- `06_deployment_plan.md` & `04_api.yaml` (How backend serves?) ➔ `Backend API` 엔드포인트 매핑.
 - `03_db_design.md` (How database is structured?) ➔ ERD 및 테이블 정의 참조.
 - `02_feature_analysis.md` (How backend logic works?) ➔ `Backend 모듈 (Controller/Service)` 매핑.
