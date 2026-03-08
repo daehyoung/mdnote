@@ -1,108 +1,135 @@
-# MarkDown Note System Use Cases (Detailed Storyboard)
+# MarkDown Note System Use Cases (Actor-Centric)
 
-## 1. User Management
+본 문서는 시스템을 사용하는 액터(Actor)별 시나리오를 바탕으로 작성된 유스케이스 기술서입니다. 각 유스케이스는 사용자의 최종 가치를 중심으로 중단점(API/DB 트랜잭션 지점)을 고려하여 설계되었습니다.
 
-### 1.1 Login Flow (`UC-U-01`)
-**Actor**: User
-1.  **User** visits `/login`.
-2.  **System** displays Login Form (Logo, Username field, Password field, Login Button).
-3.  **User** enters `username` and `password`.
-4.  **User** clicks "Login".
-5.  **System** validates credentials via API `POST /auth/login`.
-    *   *If valid*: System stores JWT token, redirects to `/`.
-    *   *If invalid*: System shows error message "Invalid credentials".
+---
 
-### 1.2 Profile Management (`UC-U-02`)
-**Actor**: User
-1.  **User** clicks on "Avatar/Name" in top-right header.
-2.  **System** shows dropdown menu: [Profile, Logout].
-3.  **User** clicks "Profile".
-4.  **System** displays Profile Modal/Page:
-    *   Read-only: Username, Role, Department.
-    *   Editable: Name, Email.
-    *   Action: "Change Password" button.
-5.  **User** updates Email and clicks "Save".
-6.  **System** updates data via API `PUT /users/me`.
+## 1. 공통 (Common Scenarios) - 모든 사용자
 
-## 2. Document Management
+### 1.1 로그인 및 접근 권한 획득 (`UC-U-01`)
+*   **액터**: 모든 사용자 (User)
+*   **최종 가치**: 시스템에 안전하게 접속하여 서버로부터 본인의 신원 및 권한(JWT)을 보장받음.
+*   **사전 조건**: 시스템에 등록된 계정 정보가 있어야 함.
+*   **기본 흐름**:
+    1. 사용자가 `/login` 화면에 접속한다.
+    2. 사용자 이름과 비밀번호를 입력하고 "Login" 버튼(`#btn-login`)을 클릭한다.
+    3. **[중단점: API POST /auth/login]** 시스템이 서버에 인증을 요청한다.
+    4. 서버가 자격 증명을 확인하고 JWT 토큰과 초기 테마 정보를 반환한다.
+    5. 시스템이 토큰을 저장하고 홈 화면(`/`)으로 이동한다.
+*   **예외 흐름**:
+    *   3-a. 잘못된 자격 증명: 시스템이 "Invalid credentials" 오류 메시지를 출력한다.
+*   **사후 조건**: 사용자의 세션 상태가 '로그인됨'으로 변경되고 전역 권한이 인가됨.
 
-### 2.1 View Document List (Home) (`UC-D-01`)
-**Actor**: User
-1.  **User** logs in or visits `/`.
-2.  **System** displays **Document List**:
-    *   Left Sidebar: Category Tree.
-    *   Main Area: List of documents.
-    *   **Filter Rule**: Only "PUBLISHED" documents are shown in this View mode.
-3.  **User** can filter by Status (All/Draft/Published/etc.) if allowed or search by keyword.
-4.  **User** clicks on a document to Read.
+### 1.2 내 프로필 관리 (`UC-U-02`)
+*   **액터**: 모든 사용자 (User)
+*   **최종 가치**: 본인의 개인 정보(사용자 이름, 이메일 등)를 최신화하거나 비밀번호를 변경함.
+*   **사전 조건**: 로그인 상태여야 함.
+*   **기본 흐름**:
+    1. 헤더의 프로필 메뉴(`#btn-profile`)를 클릭하여 상세 화면으로 진입한다.
+    2. 변경할 이름이나 이메일 정보를 입력하고 "Save"를 클릭한다.
+    3. **[중단점: API PUT /api/v1/profile]** 시스템이 변경 정보를 서버에 저장한다.
+    4. 시스템이 최신화된 프로필 정보를 화면에 재렌더링한다.
+*   **예외 흐름**:
+    *   3-a. 비밀번호 변경 시도: 현재 비밀번호가 불일치할 경우 에러 메시지를 노출한다.
+*   **사후 조건**: 데이터베이스의 사용자 정보가 갱신됨.
 
-### 2.2 Create / Edit Document (`UC-D-02`)
-**Actor**: Author (or User with Write Permission)
-1.  **Author** clicks "New Document" or "Edit" on an existing document.
-2.  **System** opens **Document Edit View** (`/documents/:id/edit`).
-3.  **Author** edits Title and Content (Markdown).
-4.  **Author** manages **Metadata** (Top Bar & Side Panel):
-    *   **Category**: Selects parent category.
-    *   **Tags**: Adds/Removes tags.
-    *   **Status**: Change lifecycle (Draft -> Review -> Published).
-5.  **Author** manages **Permissions**:
-    *   **Group Access**: Toggle Read/Write for their department.
-    *   **Public Access**: Toggle Read/Write for all users.
-6.  **Author** manages **Settings**:
-    *   **Allow Comments**: Toggles whether comments are enabled for this doc.
-7.  **Author** saves via "Save" button.
+---
 
-### 2.3 Read Document (Detail View) (`UC-D-03`)
-**Actor**: User
-1.  **User** clicks on a document from the list.
-2.  **System** opens **Document Detail View** (`/documents/:id`).
-    *   Read-only Markdown content.
-    *   Header: Title, Tags.
-    *   Footer: Author info, Permission badges.
-3.  **System** displays **Comments Section** (if "Allow Comments" is ON).
-    *   User can read existing comments.
-    *   User can add a new comment (if logged in).
-4.  **System** shows "Edit" button ONLY if user has write permission (Owner, Admin, or Group/Public Write).
+## 2. 독자 (Reader Scenarios) - 정보 소비 주체
 
-### 2.4 Search Documents (`UC-D-04`)
-**Actor**: User
-1.  **User** types "Roadmap" in Global Search Bar (Header).
-2.  **System** suggests results as user types (optional) or waits for Enter.
-3.  **User** presses Enter.
-4.  **System** navigates to **Search Results Page**.
-    *   List of matching documents (Icon, Title, Snippet, Author, Date).
-    *   Filters on left: Date Range, Author, Tag.
-5.  **User** clicks a result to view.
+### 2.1 문서 리스트 탐색 및 필터링 (`UC-D-01`)
+*   **액터**: 독자 (Reader)
+*   **최종 가치**: 본인이 접근 가능한(PUBLISHED 상태 등) 지식 자산을 카테고리와 검색을 통해 빠르게 식별함.
+*   **사전 조건**: 로그인 상태여야 함.
+*   **기본 흐름**:
+    1. 홈 화면(`/`)에서 좌측 카테고리 트리(`#list-sys-cats`, `#list-user-cats`)를 선택한다.
+    2. **[중단점: API GET /api/v1/documents]** 시스템이 선택된 카테고리의 문서 목록을 페이징하여 요청한다.
+    3. 독자가 정렬 옵션(`#sel-sort`)이나 상태 필터(`#sel-status`)를 조정한다.
+    4. 시스템이 필터링된 결과(`#list-item-doc`)를 목록에 표시한다.
+*   **사후 조건**: 검색 조건에 맞는 문서 리스트가 화면에 노출됨.
 
-### 2.5 File Attachment (`UC-D-05`)
-**Actor**: Author
-1.  **Author** clicks "Attach File" (paperclip icon) in the Document Edit View.
-2.  **System** opens file picker.
-3.  **Author** selects a file (e.g., `image.png`, `pdf`).
-4.  **System** uploads file via API `POST /api/attachments/upload`.
-5.  **System** returns metadata (ID, Original Name, Size) and displays it in the "Attachments" list.
-6.  **Author** saves the document, and the system links the attachment to the document via `doc_id`.
-7.  **System** allows users with Read permission to download the file via `GET /api/attachments/:id`.
+### 2.2 문서 상세 조회 및 마크다운 열람 (`UC-D-03`)
+*   **액터**: 독자 (Reader)
+*   **최종 가치**: 특정 문서의 내용을 마크다운으로 렌더링된 전문과 함께 확인하고, 필요 시 댓글로 의견을 나눔.
+*   **사전 조건**: 해당 문서에 대한 읽기 권한이 있어야 함.
+*   **기본 흐름**:
+    1. 목록에서 특정 문서 아이템(`#list-item-doc`)을 클릭한다.
+    2. **[중단점: API GET /api/v1/documents/{id}]** 시스템이 문서 전문과 메타데이터를 로드한다.
+    3. 시스템이 마크다운과 다이어그램(`#markdown-body`)을 화면에 출력한다.
+    4. 독자가 하단 댓글창(`#input-comment`)에 의견을 작성하고 등록(`#btn-post-comment`)한다.
+    5. **[중단점: API POST /api/v1/comments]** 시스템이 댓글을 저장하고 리스트를 갱신한다.
+*   **예외 흐름**:
+    *   2-a. 권한 없음: 시스템이 403 Forbidden 응답과 함께 접근 불가능 메시지를 표시한다.
+*   **사후 조건**: 문서 조회수가 증가(필요 시)하고, 작성된 댓글이 DB에 기록됨.
 
-## 3. System Administration
+### 2.3 통합 검색 실행 (`UC-D-04`)
+*   **액터**: 독자 (Reader)
+*   **최종 가치**: 제목, 내용, 태그 등 키워드를 통해 필요한 문서를 광범위하게 찾아냄.
+*   **사전 조건**: 로그인 상태여야 함.
+*   **기본 흐름**:
+    1. 헤더 검색바(`#input-search`)에 키워드를 입력하고 Enter를 누른다.
+    2. **[중단점: API GET /api/v1/documents?search=...]** 시스템이 전체 문서를 대상으로 키워드 검색을 수행한다.
+    3. 검색 결과 페이지에서 매칭된 리스트를 확인한다.
+*   **사후 조건**: 검색 결과가 화면에 표시됨.
 
-### 3.1 User Management (`UC-A-01`)
-**Actor**: Admin
-1.  **Admin** navigates to User Management Page.
-2.  **System** fetches user list via `GET /api/admin/users`.
-3.  **Admin** can search users by username or filter by department.
-4.  **Admin** changes a user's role (USER -> ADMIN) or status (ACTIVE -> INACTIVE) via `PUT /api/admin/users/{id}/status`.
-5.  **Admin** creates a new user via `POST /api/admin/users`.
-6.  **System** persists the user and triggers an email/notification (if configured).
+---
 
-### 3.2 Category Management (`UC-A-03`)
-**Actor**: Admin
-1.  **Admin** opens Category Management View.
-2.  **System** displays the full hierarchy.
-3.  **Admin** adds a new system-level category via `POST /api/categories`.
-4.  **System** refreshes the tree for all users.
+## 3. 작성자 (Writer Scenarios) - 지식 생성 및 관리 주체
 
-### 3.3 Dashboard Metrics (`UC-A-05`)
-**Actor**: Admin
-1.  **Admin** views the System Overview dashboard.
-2.  **System** displays statistics: Total Users, Documents, Storage used.
+### 3.1 문서 초안 작성 및 저장 (`UC-D-02`)
+*   **액터**: 작성자 (Writer/Author)
+*   **최종 가치**: 새로운 지식을 시스템에 기록하고, 카테고리/태그/권한 설정을 통해 지식의 소유권과 공개 범위를 정의함.
+*   **사전 조건**: 로그인 상태여야 함.
+*   **기본 흐름**:
+    1. "New Document" 버튼(`#btn-new`)을 클릭한다.
+    2. **[중단점: API POST /api/v1/documents]** 시스템이 빈 문서를 DRAFT 상태로 생성한다.
+    3. 에디터 화면에서 제목(`#input-title`)과 본문(`#textarea-editor`)을 입력한다.
+    4. 카테고리(`#sel-cat`)와 태그(`#input-tags`)를 지정하고 저장(`#btn-save`)한다.
+    5. **[중단점: API PUT /api/v1/documents/{id}]** 시스템이 모든 메타데이터와 본문을 업데이트한다.
+*   **예외 흐름**:
+    *   5-a. 필수값 누락: 제목이 없을 경우 시스템이 경고 메시지를 표시하고 저장을 중단한다.
+*   **사후 조건**: 새로운 문서 엔티티가 생성되고 지정된 권한에 따라 목록에 노출되기 시작함.
+
+### 3.2 파일 첨부 및 미디어 관리 (`UC-D-05`)
+*   **액터**: 작성자 (Writer/Author)
+*   **최종 가치**: 문서 내용에 보조 자료(이미지, PDF 등)를 삽입하여 정보의 전달력을 높임.
+*   **사전 조건**: 문서 편집 모드여야 함.
+*   **기본 흐름**:
+    1. 툴바의 첨부 아이콘(`#btn-attach`)을 클릭하여 파일을 선택한다.
+    2. **[중단점: API POST /api/attachments/upload]** 시스템이 파일을 서버로 전송하고 고유 URL을 발급받는다.
+    3. 시스템이 에디터 본문에 마크다운 이미지 스니펫을 자동으로 삽입한다.
+    4. 작성자가 문서를 저장하여 첨부 파일과 문서의 연관 관계를 확정한다.
+*   **사후 조건**: 물리 파일이 서버 스토리지에 저장되고 메타데이터가 DB에 기록됨.
+
+---
+
+## 4. 관리자 (Admin Scenarios) - 시스템 운영 및 통제 주체
+
+### 4.1 전체 사용자 및 계정 관리 (`UC-A-01`)
+*   **액터**: 관리자 (Admin)
+*   **최종 가치**: 조직 구성원의 계정을 생성, 비활성화하거나 권한 및 비밀번호를 관리하여 시스템 보안을 유지함.
+*   **사전 조건**: ADMIN 권한 보유.
+*   **기본 흐름**:
+    1. 어드민 콘솔의 사용자 관리 페이지로 진입한다.
+    2. **[중단점: API GET /api/admin/users]** 시스템이 전체 사용자 리스트(페이징)를 로드한다.
+    3. 신규 사용자 정보를 입력하고 저장(`#btn-save-user`)한다.
+    4. **[중단점: API POST /api/admin/users]** 시스템이 계정을 생성한다.
+*   **사후 조건**: 사용자 엔티티가 DB에 반영됨.
+
+### 4.2 전사 카테고리 구성 (`UC-A-03`)
+*   **액터**: 관리자 (Admin)
+*   **최종 가치**: 조직 전체가 공유하는 공통 문서 분류 체계(System Category)를 수립함.
+*   **사전 조건**: ADMIN 권한 보유.
+*   **기본 흐름**:
+    1. 카테고리 관리 화면 진입 후 "Add Root Category"를 클릭한다.
+    2. 카테고리명을 입력하고 저장한다.
+    3. **[중단점: API POST /api/categories]** 시스템이 `scope=SYSTEM`인 카테고리를 생성한다.
+*   **사후 조건**: 모든 사용자의 좌측 내비게이션 서랍에 새로운 카테고리가 반영됨.
+
+### 4.3 시스템 대시보드 모니터링 (`UC-A-05`)
+*   **액터**: 관리자 (Admin)
+*   **최종 가치**: 시스템의 전반적인 사용 통계(사용자 수, 문서 수 등)를 파약함.
+*   **기본 흐름**:
+    1. 관리자 대시보드 화면에 접속한다.
+    2. **[중단점: API 호출]** 시스템이 각종 통계치를 집계하여 표시한다.
+*   **사후 조건**: 운영 현황 지표가 화면에 출력됨.

@@ -124,6 +124,14 @@ sudo ./setup_firewall.sh
 3.  **검증 및 테스트 (Verification)**: 구현된 기능에 대해 단위 테스트 및 통합 테스트를 실행하여 기술적 무결성을 검증합니다.
 4.  **피드백 및 문서 고도화 (Refinement & Feedback)**: 테스트 결과 및 사용자 피드백을 바탕으로 코드를 수정하고, 그 과정에서 얻은 인사이트를 다시 설계 문서와 이슈 트래커에 반영하는 선순환 구조를 가집니다.
 
+
+---
+## 작업 가이드 문서(프롬프트)
+* **[소프트웨어 개발 단계별 역할 및 작업 지시서](./docs/.role_spec.md)**
+* **[테스트 전략 지침](./docs/.test_strategy.md)**
+* **[유스케이스 작성 지침](./docs/.usecase_strategy.md)**
+* **[코드작성 지침](./docs/.coding_rules.md)**
+
 ---
 
 ## 🛠 개발 정보 (Development Info)
