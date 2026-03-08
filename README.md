@@ -127,9 +127,7 @@ sudo ./setup_firewall.sh
 ---
 
 ## 🛠 개발 정보 (Development Info)
-* **개발 구현 Model**: Gemini 3 Pro
+* **개발 구현 Model**: Gemini 3 Pro & Gemini 3 Flash
 * **Antigravity Version**: 1.19.6
 * **작성자**: 조대형 ([daehyoung.cho@gmail.com](mailto:daehyoung.cho@gmail.com))
 
-
----

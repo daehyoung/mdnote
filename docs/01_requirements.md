@@ -1,7 +1,7 @@
 # 01 요구사항 정의서 (Requirements Specification)
 
 ## 1. 개요
-본 문서는 MarkDown Note System의 백엔드 시스템 및 유즈케이스 분석을 통해 도출된 시스템 요구사항을 정의한다.
+본 문서는 MarkDown Note System의 시스템 요구사항을 정의한다.
 
 ## 2. 사용자 역할 및 권한 (Roles & Permissions)
 * **Guest (비로그인 사용자)**: 퍼블릭으로 설정된 문서 목록 조회 및 문서 상세 내용 조회 가능.
