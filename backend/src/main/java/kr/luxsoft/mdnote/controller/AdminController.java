@@ -1,5 +1,8 @@
 package kr.luxsoft.mdnote.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.luxsoft.mdnote.model.User;
 import kr.luxsoft.mdnote.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/admin") 
 @Slf4j
+@Tag(name = "Administration", description = "User management and administrative controls")
 public class AdminController {
 
     @Autowired
@@ -24,12 +28,14 @@ public class AdminController {
     private kr.luxsoft.mdnote.service.UserService userService;
 
     @GetMapping("/users")
-    public ResponseEntity<Page<User>> getAllUsers(Pageable pageable) {
+    @Operation(summary = "Get All Users", description = "Fetches a paged list of all users in the system.")
+    public ResponseEntity<Page<User>> getAllUsers(@Parameter(description = "Pagination and sorting criteria") Pageable pageable) {
         return ResponseEntity.ok(userRepository.findAll(pageable));
     }
 
     @PutMapping("/users/{id}/status")
-    public ResponseEntity<User> updateUserStatus(@PathVariable Long id, @RequestBody String status) {
+    @Operation(summary = "Update User Status", description = "Updates the status (e.g., ACTIVE, INACTIVE) of a user.")
+    public ResponseEntity<User> updateUserStatus(@Parameter(description = "User ID", required = true) @PathVariable Long id, @RequestBody String status) {
         return userRepository.findById(id)
                 .map(user -> {
                     user.setStatus(status);
@@ -39,7 +45,8 @@ public class AdminController {
     }
 
     @PutMapping("/users/{id}/department")
-    public ResponseEntity<User> updateUserDepartment(@PathVariable Long id, @RequestBody Long deptId) {
+    @Operation(summary = "Update User Department", description = "Assigns or removes a department for a user.")
+    public ResponseEntity<User> updateUserDepartment(@Parameter(description = "User ID", required = true) @PathVariable Long id, @Parameter(description = "Department ID (null to remove)") @RequestBody Long deptId) {
         return userRepository.findById(id)
                 .map(user -> {
                     if (deptId == null) {
@@ -53,6 +60,7 @@ public class AdminController {
                 .orElse(ResponseEntity.notFound().build());
     }
     @PostMapping("/users")
+    @Operation(summary = "Create User", description = "Registers a new user with base settings.")
     public ResponseEntity<User> createUser(@RequestBody User user) {
         log.debug("AdminController: Creating user {}", user.getUsername());
         // Default values
@@ -63,18 +71,21 @@ public class AdminController {
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    @Operation(summary = "Delete User", description = "Permanently removes a user from the system.")
+    public ResponseEntity<Void> deleteUser(@Parameter(description = "User ID to delete", required = true) @PathVariable Long id) {
         userRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/users/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+    @Operation(summary = "Update User Info", description = "Updates a user's general profile information.")
+    public ResponseEntity<User> updateUser(@Parameter(description = "User ID to update", required = true) @PathVariable Long id, @RequestBody User user) {
         return ResponseEntity.ok(userService.updateUser(id, user));
     }
 
     @PutMapping("/users/{id}/password")
-    public ResponseEntity<?> resetPassword(@PathVariable Long id, @RequestBody String newPassword) {
+    @Operation(summary = "Reset User Password", description = "Administratively resets a user's password.")
+    public ResponseEntity<?> resetPassword(@Parameter(description = "User ID", required = true) @PathVariable Long id, @RequestBody String newPassword) {
         userService.resetPassword(id, newPassword);
         return ResponseEntity.ok().build();
     }

@@ -1,24 +1,24 @@
 # Current Tasks
 
 ## [Active Files]
-- backend/src/main/java/kr/luxsoft/mdnote/controller/DocumentController.java
-- backend/src/main/java/kr/luxsoft/mdnote/controller/AdminController.java
-- frontend/src/views/UserManageView.vue
-- tests/scenario_verifier.py
+- backend/src/main/java/kr/luxsoft/mdnote/config/OpenAPIConfig.java
+- backend/src/main/java/kr/luxsoft/mdnote/controller/*
+- docs/worklogs/20260308_api_documentation.md
+- README.md
 
-## [Context Summary]
-검색 및 사용자 관리 기능에 서버 사이드 페이징을 구현하고, 백엔드 빌드 OOM 문제를 해결했습니다. 모든 E2E 테스트 시나리오가 성공적으로 통과되었습니다.
+[Context Summary]
+모든 백엔드 컨트롤러(9개)에 OpenAPI(Swagger) 애노테이션을 추가하여 상세 API 문서화를 완료했습니다. 또한 작업 내용을 아카이빙하고 README.md에 관련 링크를 추가했습니다.
 
-## [Next Step]
-완료된 기능에 대한 사용자 피드백 확인 및 추가 개선 사항 논의
+[Next Step]
+Swagger UI를 통한 API 명세 검토 및 프론트엔드 연동성 확인
 
-## [Task List]
-- [x] 검색/정렬 백엔드 테스트 추가
-- [x] 작성자 기준 정렬 테스트 및 구현
-- [x] 검색 기능 서버 사이드 페이징 구현
-- [x] 사용자 관리 서버 사이드 페이징 구현
-- [x] 백엔드 빌드 메모리 최적화
-- [x] E2E 통합 테스트 검증 완료
+[Task List]
+- [x] OpenAPI(Swagger) 기반 API 상세 문서화 (9개 컨트롤러)
+- [x] Swagger UI 내 JWT 인증 연동 설정 확인
+- [x] 작업 로그 아카이빙 및 README.md 업데이트
+- [x] 개발 표준 워크플로우(`.workflow.md`) 수립 및 Git 절차 추가
+- [x] 전체 시스템 상태 검증 완료
+검증 완료
 - [x] 불일치 문서(`api-design`, `ui-design` 등) 교정 완료
 - [x] `docs/04_frontend_ui_manual.md` 프론트엔드 화면 기술서 작성 
 - [x] `docs/05_test_plan.md` 종합 테스트 계획 및 설계서 작성 (Backend/Frontend 단위 및 통합 테스트 포함)

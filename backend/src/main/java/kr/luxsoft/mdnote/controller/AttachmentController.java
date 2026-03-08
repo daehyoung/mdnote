@@ -3,6 +3,9 @@ package kr.luxsoft.mdnote.controller;
 import kr.luxsoft.mdnote.model.Attachment;
 import kr.luxsoft.mdnote.repository.AttachmentRepository;
 import kr.luxsoft.mdnote.service.FileStorageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +20,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/attachments")
+@Tag(name = "Attachments", description = "File upload and download APIs")
 public class AttachmentController {
 
     @Autowired
@@ -26,7 +30,8 @@ public class AttachmentController {
     private AttachmentRepository attachmentRepository;
 
     @PostMapping("/upload")
-    public ResponseEntity<Attachment> uploadFile(@RequestParam("file") MultipartFile file) {
+    @Operation(summary = "Upload File", description = "Uploads an attachment and returns its metadata.")
+    public ResponseEntity<Attachment> uploadFile(@Parameter(description = "Multipart file to upload", required = true) @RequestParam("file") MultipartFile file) {
         String originalFileName = file.getOriginalFilename();
         String fileName = fileStorageService.storeFile(file); // Stores as UUID+Ext
         
@@ -50,7 +55,8 @@ public class AttachmentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable Long id, HttpServletRequest request) {
+    @Operation(summary = "Download File", description = "Downloads an attachment by ID.")
+    public ResponseEntity<Resource> downloadFile(@Parameter(description = "Attachment ID", required = true) @PathVariable Long id, HttpServletRequest request) {
         Attachment attachment = attachmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Attachment not found " + id));
                 
@@ -76,7 +82,8 @@ public class AttachmentController {
                 .body(resource);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAttachment(@PathVariable Long id) {
+    @Operation(summary = "Delete Attachment", description = "Removes an attachment metadata.")
+    public ResponseEntity<Void> deleteAttachment(@Parameter(description = "Attachment ID to delete", required = true) @PathVariable Long id) {
         attachmentRepository.deleteById(id);
         // Ideally also delete physical file using fileStorageService
         return ResponseEntity.ok().build();

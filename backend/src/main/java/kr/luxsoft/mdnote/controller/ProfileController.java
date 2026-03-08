@@ -2,6 +2,8 @@ package kr.luxsoft.mdnote.controller;
 
 import kr.luxsoft.mdnote.model.User;
 import kr.luxsoft.mdnote.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/profile")
+@Tag(name = "Profile", description = "User profile and personal settings APIs")
 public class ProfileController {
 
     @Autowired
@@ -21,6 +24,7 @@ public class ProfileController {
     private PasswordEncoder passwordEncoder;
 
     @GetMapping
+    @Operation(summary = "Get Profile", description = "Fetches the current authenticated user's profile details.")
     public ResponseEntity<User> getProfile(Principal principal) {
         // In our simple mock auth, Principal might be null or just a name. 
         // We need to fetch by username from context or simulate it.
@@ -36,6 +40,7 @@ public class ProfileController {
     }
 
     @PutMapping
+    @Operation(summary = "Update Profile", description = "Updates profile information (name, email, theme) for the current user.")
     public ResponseEntity<User> updateProfile(Principal principal, @RequestBody Map<String, String> payload) {
         String username = (principal != null) ? principal.getName() : "test";
         return userRepository.findByUsername(username)
@@ -49,6 +54,7 @@ public class ProfileController {
     }
 
     @PutMapping("/password")
+    @Operation(summary = "Update Password", description = "Changes the password for the current user.")
     public ResponseEntity<Void> updatePassword(Principal principal, @RequestBody Map<String, String> payload) {
         String username = (principal != null) ? principal.getName() : "test";
         String newPassword = payload.get("password");

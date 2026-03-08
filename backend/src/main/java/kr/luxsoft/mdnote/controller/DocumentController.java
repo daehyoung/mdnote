@@ -2,6 +2,9 @@ package kr.luxsoft.mdnote.controller;
 
 import kr.luxsoft.mdnote.model.Document;
 import kr.luxsoft.mdnote.service.DocumentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,20 +15,22 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/documents")
+@Tag(name = "Documents", description = "Document management, search, and filtering APIs")
 public class DocumentController {
 
     @Autowired
     private DocumentService documentService;
 
     @GetMapping
+    @Operation(summary = "Get All Documents", description = "Fetches a paged list of documents with optional filtering by category, status, tag, or keyword.")
     public Page<Document> getAllDocuments(
-            @RequestParam(required = false) Long categoryId,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String tagName, // Added tagName
-            @RequestParam(required = false) String query,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "updatedAt,desc") String[] sort,
+            @Parameter(description = "Category ID to filter") @RequestParam(required = false) Long categoryId,
+            @Parameter(description = "Document status (e.g., ACTIVE, ARCHIVED)") @RequestParam(required = false) String status,
+            @Parameter(description = "Tag name to filter") @RequestParam(required = false) String tagName,
+            @Parameter(description = "Search keyword in title/content") @RequestParam(required = false) String query,
+            @Parameter(description = "Page number (0-indexed)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Sort criteria (e.g., updatedAt,desc)") @RequestParam(defaultValue = "updatedAt,desc") String[] sort,
             java.security.Principal principal) {
         
         // Parse sort
@@ -52,11 +57,12 @@ public class DocumentController {
     }
 
     @GetMapping("/search")
+    @Operation(summary = "Search Documents", description = "Specifically searches for documents by keyword with full pagination.")
     public Page<Document> searchDocuments(
-            @RequestParam String query,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "updatedAt,desc") String[] sort) {
+            @Parameter(description = "Search query keyword", required = true) @RequestParam String query,
+            @Parameter(description = "Page index (0-indexed)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Items per page") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Sort criteria (e.g., title,asc)") @RequestParam(defaultValue = "updatedAt,desc") String[] sort) {
         
         // Similar sort parsing logic as getAllDocuments
         String sortField = "updatedAt";
@@ -78,20 +84,23 @@ public class DocumentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Document> getDocumentById(@PathVariable Long id) {
+    @Operation(summary = "Get Document Details", description = "Returns detail information for a single document by ID.")
+    public ResponseEntity<Document> getDocumentById(@Parameter(description = "Document ID", required = true) @PathVariable Long id) {
         return documentService.getDocumentById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
+    @Operation(summary = "Create Document", description = "Creates a new document using the provided JSON body.")
     public ResponseEntity<Document> createDocument(@RequestBody Document document, java.security.Principal principal) {
         Document created = documentService.createDocument(document, principal.getName());
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Document> updateDocument(@PathVariable Long id, @RequestBody Document document, java.security.Principal principal) {
+    @Operation(summary = "Update Document", description = "Updates an existing document. Only accessible by the owner or admin.")
+    public ResponseEntity<Document> updateDocument(@Parameter(description = "Document ID to update") @PathVariable Long id, @RequestBody Document document, java.security.Principal principal) {
         try {
             Document updated = documentService.updateDocument(id, document, principal.getName());
             if (updated != null) {
@@ -104,7 +113,8 @@ public class DocumentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDocument(@PathVariable Long id, java.security.Principal principal) {
+    @Operation(summary = "Delete Document", description = "Removes a document from the system. Only accessible by the owner or admin.")
+    public ResponseEntity<Void> deleteDocument(@Parameter(description = "Document ID to delete") @PathVariable Long id, java.security.Principal principal) {
         try {
             documentService.deleteDocument(id, principal.getName());
             return ResponseEntity.noContent().build();

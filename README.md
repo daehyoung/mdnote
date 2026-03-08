@@ -14,6 +14,8 @@
 6. **[통합 배포 설계서 (`06_deployment_plan.md`)](./docs/06_deployment_plan.md)**: Nginx, Spring Boot, PostgreSQL의 Docker 컨테이너 구성(`docker-compose`) 및 실행 스크립트 모음.
 7. **[요구사항 추적 매트릭스(RTM) (`07_traceability_matrix.md`)](./docs/07_traceability_matrix.md)**: 요구사항(REQ)부터 유스케이스(UC), 프론트엔드 화면(UI 요소), 백엔드 API 엔드포인트까지의 양방향 기능 추적 및 맵핑 테이블.
 8. **[이슈 트래커 (`08_issue_tracker.md`)](./docs/08_issue_tracker.md)**: 관리되고 있는 결함(Bug) 및 품질 개선 사항의 통합 추적 리포트.
+9. **[작업 로그 (Work Logs)](./docs/worklogs/)**: 구현 단계별 기술 의사결정 및 상세 작업 내역 아카이브.
+    - [2026-03-08: API 문서화 (OpenAPI/Swagger) 도입 - 계획](./docs/worklogs/20260308_api_documentation.md) / [결과](./docs/worklogs/20260308_api_documentation_walkthrough.md)
 
 ---
 

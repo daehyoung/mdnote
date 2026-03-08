@@ -6,9 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @lombok.extern.slf4j.Slf4j
+@Tag(name = "Authentication", description = "User login and authentication APIs")
 public class AuthController {
 
     @Autowired
@@ -24,6 +28,7 @@ public class AuthController {
     private String authType;
 
     @PostMapping("/login")
+    @Operation(summary = "User Login", description = "Authenticates user and returns a token (JWT or Simple)")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
         return userRepository.findByUsername(loginRequest.getUsername())
             .map(user -> {
