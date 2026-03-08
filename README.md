@@ -128,12 +128,11 @@ sudo ./setup_firewall.sh
 
 ---
 ## AI 작업 가이드 문서(프롬프트)
-* **[소프트웨어 개발 단계별 역할 및 작업 지시서](./docs/.role_spec.md)**
-* **[유스케이스 작성 지침](./docs/.usecase_strategy.md)**
+* **소프트웨어 개발 단계별 역할 및 작업 지시서**
 * **[유스케이스 설계 가이드](./docs/usecase-guide.md)**
-* **[코드작성 지침](./docs/.coding_rules.md)**
-* **[테스트 전략 지침](./docs/.test_strategy.md)**
----
+* **코드작성 지침**
+* **테스트 전략 지침**
+
 
 ## 🛠 개발 정보 (Development Info)
 * **개발 구현 Model**: Gemini 3 Pro & Gemini 3 Flash
