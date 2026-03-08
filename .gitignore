@@ -6,4 +6,5 @@ backups
 docs/.role_spec.md
 docs/.test_strategy.md
 docs/.usecase_strategy.md
+docs/.workflow.md
 .env

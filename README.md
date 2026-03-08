@@ -9,6 +9,7 @@
 1. **[요구사항 정의서 (`01_requirements.md`)](./docs/01_requirements.md)**: 사용자 권한(Role) 정의 및 시스템 전반의 핵심 기능 요구사항 명세.
 2. **[기능 분석표 (`02_feature_analysis.md`)](./docs/02_feature_analysis.md)**: 백엔드 모듈 구조 및 컨트롤러-기능 맵핑 분석.
 3. **[시스템 아키텍처 설계 (`03_architecture.md`)](./docs/03_architecture.md)**: 기술 스택, 인증(Security) 전략, 데이터베이스 설계 사상 도식화.
+4. **[데이터베이스 설계서 (`03_db_design.md`)](./docs/03_db_design.md)**: 데이터베이스 스키마(ERD), 테이블 정의 및 SQL 스크립트.
 4. **[프론트엔드 화면 기술서 (`04_frontend_ui_manual.md`)](./docs/04_frontend_ui_manual.md)**: 각 화면(뷰)의 와이어프레임(객체 트리) 구조 및 버튼 요소-API 엔드포인트 연동 규격 상세 리스트.
 5. **[종합 테스트 계획서 (`05_test_plan.md`)](./docs/05_test_plan.md)**: 프론트/백엔드 단위(Unit) 및 통합(E2E/Integration) 테스트 케이스 전략 가이드.
 6. **[통합 배포 설계서 (`06_deployment_plan.md`)](./docs/06_deployment_plan.md)**: Nginx, Spring Boot, PostgreSQL의 Docker 컨테이너 구성(`docker-compose`) 및 실행 스크립트 모음.
