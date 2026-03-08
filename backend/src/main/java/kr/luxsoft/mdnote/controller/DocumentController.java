@@ -51,6 +51,32 @@ public class DocumentController {
         return documentService.getAllDocuments(categoryId, status, tagName, query, pageable, callbackUsername);
     }
 
+    @GetMapping("/search")
+    public Page<Document> searchDocuments(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "updatedAt,desc") String[] sort) {
+        
+        // Similar sort parsing logic as getAllDocuments
+        String sortField = "updatedAt";
+        org.springframework.data.domain.Sort.Direction direction = org.springframework.data.domain.Sort.Direction.DESC;
+        
+        if (sort.length > 0) {
+            if (sort[0].contains(",")) {
+                String[] parts = sort[0].split(",");
+                sortField = parts[0];
+                if (parts.length > 1 && "asc".equalsIgnoreCase(parts[1])) direction = org.springframework.data.domain.Sort.Direction.ASC;
+            } else {
+                sortField = sort[0];
+                if (sort.length > 1 && "asc".equalsIgnoreCase(sort[1])) direction = org.springframework.data.domain.Sort.Direction.ASC;
+            }
+        }
+        
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by(direction, sortField));
+        return documentService.searchDocuments(query, pageable);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Document> getDocumentById(@PathVariable Long id) {
         return documentService.getDocumentById(id)

@@ -86,17 +86,20 @@ router.beforeEach(async (to, from, next) => {
     return;
   }
   
+  // Hydrate user profile if token exists but user state is null
+  if (isAuthenticated && !authStore.user) {
+    try {
+      await authStore.fetchProfile();
+    } catch (e) {
+      console.error("Failed to hydrate profile in guard", e);
+      // If profile fetch fails (e.g. invalid/expired token), force logout/login
+      authStore.logout();
+      next('/login');
+      return;
+    }
+  }
+
   if (to.path.startsWith('/admin')) {
-      if (!authStore.user && isAuthenticated) {
-          try {
-              await authStore.fetchProfile();
-          } catch (e) {
-              console.error("Failed to fetch profile in guard", e);
-              next('/login');
-              return;
-          }
-      }
-      
       if (authStore.user && authStore.user.role !== 'ADMIN') {
           next('/');
           return;

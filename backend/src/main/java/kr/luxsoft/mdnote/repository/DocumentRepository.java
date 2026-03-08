@@ -4,7 +4,6 @@ import kr.luxsoft.mdnote.model.Document;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,7 +50,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query("SELECT d FROM Document d WHERE " +
            "LOWER(d.title) LIKE LOWER(CONCAT('%', CAST(:query AS string), '%')) OR " +
            "EXISTS (SELECT t FROM d.tags t WHERE LOWER(t.name) LIKE LOWER(CONCAT('%', CAST(:query AS string), '%')))")
-    List<Document> searchDocuments(@Param("query") String query); // Legacy or Admin usage? We should deprecate/update this too.
+    Page<Document> searchDocuments(@Param("query") String query, Pageable pageable);
 
     // Let's replace the strict 'findAll' and 'findByStatus' logic in Service with the consolidated query above.
     // Keeping this for reference or specialized usage if needed, but safe to omit if Service uses consolidated.

@@ -39,6 +39,12 @@ class ScenarioVerifier:
 
             # Security Check: Regular user should not access Admin API
             self.test_admin_api_security()
+
+            # New: Search and Sorting Scenarios
+            self.test_search_scenarios()
+            self.test_sorting_scenarios()
+            self.test_sorting_by_author()
+            self.test_paging_search()
             
             print("\n✅ All Use Case Scenarios PASSED!")
         except Exception as e:
@@ -147,7 +153,8 @@ class ScenarioVerifier:
         admin_session.headers.update({"Authorization": f"Bearer {token}"})
         
         # Cleanup: Delete new_tester if exists (for idempotency)
-        users_list = admin_session.get(f"{BASE_URL}/admin/users", timeout=TIMEOUT).json()
+        resp = admin_session.get(f"{BASE_URL}/admin/users", timeout=TIMEOUT)
+        users_list = resp.json().get("content", [])
         existing_new_tester = next((u for u in users_list if u["username"] == "new_tester"), None)
         if existing_new_tester:
             admin_session.delete(f"{BASE_URL}/admin/users/{existing_new_tester['id']}", timeout=TIMEOUT)
@@ -168,10 +175,11 @@ class ScenarioVerifier:
         self.log("UC-A-01", f"Admin created new user: {new_user.get('username')} (ID: {new_user_id})")
 
         # 3. List and Verify
-        users_response = admin_session.get(f"{BASE_URL}/admin/users", timeout=TIMEOUT)
-        assert users_response.status_code == 200, "Admin failed to fetch user list"
-        users = users_response.json()
-        usernames = [u["username"] for u in users]
+        resp = admin_session.get(f"{BASE_URL}/admin/users", timeout=TIMEOUT)
+        assert resp.status_code == 200
+        # Unified Paging: admin/users now returns Page<User>
+        users_list = resp.json().get("content", [])
+        usernames = [u["username"] for u in users_list]
         assert "new_tester" in usernames, "Created user not found in list"
         
         # 4. Update Status (INACTIVE)
@@ -182,7 +190,7 @@ class ScenarioVerifier:
         assert status_response.json()["status"] == "INACTIVE"
         self.log("UC-A-01", "Admin successfully updated user status to INACTIVE.")
 
-        self.log("UC-A-01", f"Admin verified {len(users)} users and full management flow.")
+        self.log("UC-A-01", f"Admin verified {len(users_list)} users and full management flow.")
 
     def test_password_flows(self):
         self.log("PWD-CHG", "Starting Password Change Scenarios...")
@@ -213,9 +221,10 @@ class ScenarioVerifier:
         admin_token = resp.json().get("token")
         admin_session.headers.update({"Authorization": f"Bearer {admin_token}"})
         
-        # Find 'new_tester' id
-        users = admin_session.get(f"{BASE_URL}/admin/users").json()
-        target_user = next(u for u in users if u["username"] == "new_tester")
+        # a. Fetch User List (to get ID)
+        resp = admin_session.get(f"{BASE_URL}/admin/users", timeout=TIMEOUT)
+        users_content = resp.json().get("content", [])
+        target_user = next(u for u in users_content if u["username"] == "new_tester")
         uid = target_user["id"]
         
         # Reset via plain text body (as seen in AdminController @RequestBody String newPassword)
@@ -248,6 +257,175 @@ class ScenarioVerifier:
         self.log("SECURITY", "Unauthorized password reset attempt BLOCKED (403 Forbidden).")
         
         self.log("SECURITY", "All security role restrictions verified.")
+
+    def test_search_scenarios(self):
+        self.log("SEARCH", "Starting Search Scenarios...")
+        
+        # 1. Create test documents
+        docs_to_create = [
+            {"title": "Alpha Unique Search", "content": "Content 1", "tags": [{"name": "test-tag-1"}]},
+            {"title": "Beta Unique Search", "content": "Content 2", "tags": [{"name": "test-tag-2"}]},
+            {"title": "Gamma", "content": "Content 3", "tags": [{"name": "test-tag-1"}, {"name": "test-tag-3"}]}
+        ]
+        
+        created_ids = []
+        for doc in docs_to_create:
+            resp = self.session.post(f"{BASE_URL}/documents", json=doc, timeout=TIMEOUT)
+            assert resp.status_code == 201
+            created_ids.append(resp.json()["id"])
+            
+        # 2. Search by Title Keyword
+        search_resp = self.session.get(f"{BASE_URL}/documents", params={"query": "Unique Search"}, timeout=TIMEOUT)
+        assert search_resp.status_code == 200
+        results = search_resp.json()["content"]
+        titles = [d["title"] for d in results]
+        assert len(results) >= 2
+        assert "Alpha Unique Search" in titles
+        assert "Beta Unique Search" in titles
+        
+        # 3. Search by Tag
+        tag_search_resp = self.session.get(f"{BASE_URL}/documents", params={"tagName": "test-tag-1"}, timeout=TIMEOUT)
+        assert tag_search_resp.status_code == 200
+        tag_results = tag_search_resp.json()["content"]
+        tag_titles = [d["title"] for d in tag_results]
+        assert len(tag_results) >= 2
+        assert "Alpha Unique Search" in tag_titles
+        assert "Gamma" in tag_titles
+        
+        # 4. Negative Search
+        neg_search_resp = self.session.get(f"{BASE_URL}/documents", params={"query": "NonExistentKeywordXYZ"}, timeout=TIMEOUT)
+        assert neg_search_resp.status_code == 200
+        assert neg_search_resp.json()["totalElements"] == 0
+        
+        self.log("SEARCH", "Search scenarios verified (Keyword, Tag, Negative).")
+        
+        # Cleanup
+        for did in created_ids:
+            self.session.delete(f"{BASE_URL}/documents/{did}", timeout=TIMEOUT)
+
+    def test_sorting_scenarios(self):
+        self.log("SORT", "Starting Sorting Scenarios...")
+        
+        # 1. Create documents in order B, A, C (with delays to ensure different createdAt)
+        import time
+        sort_docs = [
+            {"title": "B-Sort", "content": "B content"},
+            {"title": "A-Sort", "content": "A content"},
+            {"title": "C-Sort", "content": "C content"}
+        ]
+        
+        created_ids = []
+        for doc in sort_docs:
+            resp = self.session.post(f"{BASE_URL}/documents", json=doc, timeout=TIMEOUT)
+            assert resp.status_code == 201
+            created_ids.append(resp.json()["id"])
+            time.sleep(0.1) # Small delay for createdAt ordering
+            
+        # 2. Sort by Title ASC
+        resp_asc = self.session.get(f"{BASE_URL}/documents", params={"sort": "title,asc", "query": "-Sort"}, timeout=TIMEOUT)
+        assert resp_asc.status_code == 200
+        titles_asc = [d["title"] for d in resp_asc.json()["content"]]
+        assert titles_asc == ["A-Sort", "B-Sort", "C-Sort"]
+        
+        # 3. Sort by Title DESC
+        resp_desc = self.session.get(f"{BASE_URL}/documents", params={"sort": "title,desc", "query": "-Sort"}, timeout=TIMEOUT)
+        assert resp_desc.status_code == 200
+        titles_desc = [d["title"] for d in resp_desc.json()["content"]]
+        assert titles_desc == ["C-Sort", "B-Sort", "A-Sort"]
+        
+        # 4. Sort by CreatedAt DESC
+        # Sequence of creation was B (oldest) -> A -> C (newest)
+        # DESC order should be C -> A -> B
+        resp_time = self.session.get(f"{BASE_URL}/documents", params={"sort": "createdAt,desc", "query": "-Sort"}, timeout=TIMEOUT)
+        assert resp_time.status_code == 200
+        titles_time = [d["title"] for d in resp_time.json()["content"]]
+        assert titles_time == ["C-Sort", "A-Sort", "B-Sort"]
+        
+        self.log("SORT", "Sorting scenarios verified (Title ASC/DESC, CreatedAt DESC).")
+        
+        # Cleanup
+        for did in created_ids:
+            self.session.delete(f"{BASE_URL}/documents/{did}", timeout=TIMEOUT)
+
+    def test_sorting_by_author(self):
+        self.log("SORT-AUTH", "Starting Author Sorting Scenarios...")
+        
+        # 1. Admin session setup
+        admin_session = requests.Session()
+        admin_resp = admin_session.post(f"{BASE_URL}/v1/auth/login", json={"username": "admin", "password": "admin"}, timeout=TIMEOUT)
+        assert admin_resp.status_code == 200
+        admin_token = admin_resp.json().get("token")
+        admin_session.headers.update({"Authorization": f"Bearer {admin_token}"})
+        
+        # 2. Create documents with different authors
+        # User 'test' doc
+        test_doc_resp = self.session.post(f"{BASE_URL}/documents", json={"title": "Test-Auth-Doc", "content": "test"}, timeout=TIMEOUT)
+        assert test_doc_resp.status_code == 201
+        test_doc_id = test_doc_resp.json()["id"]
+        
+        # Admin doc
+        admin_doc_resp = admin_session.post(f"{BASE_URL}/documents", json={"title": "Admin-Auth-Doc", "content": "admin"}, timeout=TIMEOUT)
+        assert admin_doc_resp.status_code == 201
+        admin_doc_id = admin_doc_resp.json()["id"]
+        
+        try:
+            # 3. Sort by Author Username ASC
+            # 'admin' < 'test'
+            resp_asc = self.session.get(f"{BASE_URL}/documents", params={"sort": "author.username,asc", "query": "-Auth-Doc"}, timeout=TIMEOUT)
+            assert resp_asc.status_code == 200
+            titles_asc = [d["title"] for d in resp_asc.json()["content"]]
+            assert titles_asc == ["Admin-Auth-Doc", "Test-Auth-Doc"]
+            
+            # 4. Sort by Author Username DESC
+            # 'test' > 'admin'
+            resp_desc = self.session.get(f"{BASE_URL}/documents", params={"sort": "author.username,desc", "query": "-Auth-Doc"}, timeout=TIMEOUT)
+            assert resp_desc.status_code == 200
+            titles_desc = [d["title"] for d in resp_desc.json()["content"]]
+            assert titles_desc == ["Test-Auth-Doc", "Admin-Auth-Doc"]
+            
+            self.log("SORT-AUTH", "Author sorting scenarios verified (ASC/DESC).")
+            
+        finally:
+            # Cleanup
+            self.session.delete(f"{BASE_URL}/documents/{test_doc_id}", timeout=TIMEOUT)
+            admin_session.delete(f"{BASE_URL}/documents/{admin_doc_id}", timeout=TIMEOUT)
+
+    def test_paging_search(self):
+        self.log("PAGING", "Starting Paging Search Scenario...")
+        
+        # 1. Create 5 documents with 'PagingTest' keyword
+        page_keyword = "PagingTestXYZ"
+        created_ids = []
+        for i in range(5):
+            payload = {"title": f"{page_keyword} Doc {i}", "content": f"Content {i}"}
+            resp = self.session.post(f"{BASE_URL}/documents", json=payload, timeout=TIMEOUT)
+            assert resp.status_code == 201
+            created_ids.append(resp.json()["id"])
+            
+        try:
+            # 2. Request page 0 with size 2
+            resp = self.session.get(f"{BASE_URL}/documents/search", params={"query": page_keyword, "page": 0, "size": 2}, timeout=TIMEOUT)
+            assert resp.status_code == 200
+            data = resp.json()
+            
+            assert len(data["content"]) == 2
+            assert data["totalElements"] == 5
+            assert data["totalPages"] == 3
+            assert data["number"] == 0 # Current page
+            
+            # 3. Request page 2 (the last page)
+            resp_last = self.session.get(f"{BASE_URL}/documents/search", params={"query": page_keyword, "page": 2, "size": 2}, timeout=TIMEOUT)
+            assert resp_last.status_code == 200
+            data_last = resp_last.json()
+            assert len(data_last["content"]) == 1 # Only 1 left (0,1; 2,3; 4)
+            assert data_last["last"] is True
+            
+            self.log("PAGING", "Paging search scenario verified (Size, TotalElements, TotalPages).")
+            
+        finally:
+            # Cleanup
+            for did in created_ids:
+                self.session.delete(f"{BASE_URL}/documents/{did}", timeout=TIMEOUT)
 
 if __name__ == "__main__":
     verifier = ScenarioVerifier()

@@ -156,8 +156,8 @@ public class DocumentService {
         return author.getDepartment().getId().equals(user.getDepartment().getId());
     }
 
-    public List<Document> searchDocuments(String query) {
-        return documentRepository.searchDocuments(query);
+    public Page<Document> searchDocuments(String query, Pageable pageable) {
+        return documentRepository.searchDocuments(query, pageable);
     }
     
     private void processTags(Document doc) {

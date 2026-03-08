@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # 색상 정의
 GREEN='\033[0;32m'
@@ -10,7 +11,7 @@ echo -e "${BLUE}[Docker Build & Deploy Script]${NC}"
 # 1. 프론트엔드 빌드 (Dockerfile이 dist 폴더를 필요로 함)
 echo -e "${GREEN}Step 1: Building Frontend...${NC}"
 cd frontend
-npm install && npm run build
+npm install --legacy-peer-deps && npm run build
 cd ..
 
 # 2. 기존 컨테이너 중지 및 삭제

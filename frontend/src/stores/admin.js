@@ -6,13 +6,28 @@ export const useAdminStore = defineStore('admin', {
     users: [],
     loading: false,
     error: null,
+    // Pagination state
+    page: 1,
+    size: 10,
+    totalPages: 0,
+    totalElements: 0,
   }),
   actions: {
-    async fetchUsers() {
+    async fetchUsers(page = null, size = null) {
       this.loading = true;
+      if (page !== null) this.page = page;
+      if (size !== null) this.size = size;
+      
       try {
-        const response = await api.get('/admin/users');
-        this.users = response.data;
+        const response = await api.get('/admin/users', {
+            params: {
+                page: this.page - 1,
+                size: this.size
+            }
+        });
+        this.users = response.data.content;
+        this.totalPages = response.data.totalPages;
+        this.totalElements = response.data.totalElements;
       } catch (error) {
         this.error = 'Failed to fetch users';
         console.error("Failed to fetch users", error);

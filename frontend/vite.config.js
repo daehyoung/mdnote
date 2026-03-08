@@ -9,19 +9,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export default defineConfig({
   plugins: [
     vue(),
-    {
-      name: 'stub-css',
-      transform(code, id) {
-        if (id.endsWith('.css')) {
-          return { code: 'export default {}' }
-        }
-      }
-    }
   ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '\\.css$': path.resolve(__dirname, './src/__tests__/styleMock.js'),
     },
   },
   server: {

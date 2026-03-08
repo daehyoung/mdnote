@@ -7,10 +7,13 @@
     </div>
     
     <v-card>
-        <v-data-table
+        <v-data-table-server
+            v-model:items-per-page="itemsPerPage"
             :headers="headers"
             :items="users"
+            :items-length="totalElements"
             :loading="loading"
+            @update:options="loadItems"
         >
             <template v-slot:item.role="{ item }">
                 <v-chip :color="item.role === 'ADMIN' ? 'red' : item.role === 'MANAGER' ? 'orange' : 'blue'">{{ item.role }}</v-chip>
@@ -45,7 +48,7 @@
                     </v-list>
                  </v-menu>
             </template>
-        </v-data-table>
+        </v-data-table-server>
     </v-card>
 
     <!-- Create/Edit User Dialog -->
@@ -142,6 +145,8 @@ const orgStore = useOrganizationStore();
 // Use store state
 const users = computed(() => adminStore.users);
 const loading = computed(() => adminStore.loading);
+const totalElements = computed(() => adminStore.totalElements);
+const itemsPerPage = ref(10);
 
 const assignDialog = ref(false);
 const userDialog = ref(false);
@@ -177,8 +182,12 @@ const headers = [
 
 const roles = ['USER', 'ADMIN', 'MANAGER'];
 
-const fetchUsers = async () => {
-    await adminStore.fetchUsers();
+const fetchUsers = async (page = 1, size = 10) => {
+    await adminStore.fetchUsers(page, size);
+};
+
+const loadItems = ({ page, itemsPerPage }) => {
+    fetchUsers(page, itemsPerPage);
 };
 
 const toggleStatus = async (user) => {
@@ -279,6 +288,6 @@ const flatDepartments = computed(() => {
 });
 
 onMounted(() => {
-    fetchUsers();
+    // Initial fetch handled by v-data-table-server @update:options
 });
 </script>
