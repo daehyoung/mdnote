@@ -15,6 +15,7 @@
 ## AI 작업 가이드 문서(프롬프트)
 * **소프트웨어 개발 단계별 역할 및 작업 지시서**
 * **[유스케이스 설계 가이드](./docs/usecase-guide.md)**
+* **[아키텍처 설계 가이드](./docs/architecture-guide.md)**
 * **코드작성 지침**
 * **테스트 전략 지침**
 
@@ -35,7 +36,7 @@
 
 1. **[요구사항 정의서 (`01_requirements.md`)](./docs/01_requirements.md)**: 사용자 권한(Role) 정의 및 시스템 전반의 핵심 기능 요구사항 명세.
 2. **[기능 분석표 (`02_feature_analysis.md`)](./docs/02_feature_analysis.md)**: 백엔드 모듈 구조 및 컨트롤러-기능 맵핑 분석.
-3. **[시스템 아키텍처 설계 (`03_architecture.md`)](./docs/03_architecture.md)**: 기술 스택, 인증(Security) 전략, 데이터베이스 설계 사상 도식화.
+3. **[시스템 아키텍처 설계 (`03_architecture.md`)](./docs/03_architecture.md)**: 기술 스택, 인증(Security) 전략, 데이터베이스 설계 사상 도식화. (**[가이드](./docs/architecture-guide.md)**)
 4. **[데이터베이스 설계서 (`03_db_design.md`)](./docs/03_db_design.md)**: 데이터베이스 스키마(ERD), 테이블 정의 및 SQL 스크립트.
 5. **[유스케이스 명세서 (`usecases.md`)](./docs/usecases.md)**: 액터별 가치 중심 시나리오와 시스템 상호작용 및 중단점 정의.
 6. **[프론트엔드 화면 설계서 (`04_frontend_ui_design.md`)](./docs/04_frontend_ui_design.md)**: 각 화면(뷰)의 와이어프레임(객체 트리) 구조 및 버튼 요소-API 엔드포인트 연동 규격 상세 리스트.
