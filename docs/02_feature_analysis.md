@@ -23,6 +23,8 @@
 | **REQ-D-04** | **Storage** | 파일 처리 | 파일 업로드 (`/upload`) | `/api/attachments/upload` | MultipartFile을 받아 시스템 물리 스토리지에 UUID 형태 파일로 저장 후 메타정보 반환. |
 | **REQ-D-04** | | | 첨부파일 다운로드 (`/{id}`) | `/api/attachments/{id}` | 파일 ID 기반으로 물리 스토리지에서 리소스를 로드, 본래 Logical Name으로 다운로드 제공. |
 | **REQ-D-04** | | | 파일 삭제 | `/api/attachments/{id}` | 데이터베이스에서 첨부 내역과 함께 연관된 물리 파일을 삭제(향후 반영 구역). |
+| **REQ-A-01** | **System Admin** | 모니터링 | 대시보드 조회 | `/api/admin/metrics` (예정) | 시스템 리소스 사용량 및 지식 생산 지표 통계 시각화 데이터 제공. |
+| **REQ-A-02** | | 자원 최적화 | 고립된 파일 관리 | `/api/admin/attachments/orphaned` | `doc_id`가 없는 고립된 첨부파일 식별 및 일괄 삭제 기능. |
 
 ## 핵심 분석 및 위험 요소 (Risk Assessment)
 1. **페이징 및 검색 부하**: `DocumentController.getAllDocuments()`의 검색 조건이 복잡해질 경우(카테고리+태그+전문 쿼리 등 조합 시), DB 조인 부하(N+1 Query 등)가 발생할 가능성이 있으므로 JPA Fetch Join / QueryDSL 적용이 권장됨.

@@ -13,6 +13,6 @@
 
 [Task List]
 - [x] `docs/usecases.md` 사용자 관리 분리 및 고립된 파일 관리(UC-A-06) 추가
-- [x] `docs/01_requirements.md` & `07_traceability_matrix.md` 최신 요구사항 반영
+- [x] `docs/01_requirements.md`, `02_feature_analysis.md`, `07_traceability_matrix.md` 최신 요구사항(REQ-A-01, REQ-A-02) 반영 완료
+- [x] 모든 공식 문서 간의 구현 상태 및 추적성 동기화 완료
 - [x] `DocumentService.java` 첨부파일 연결 로직 결함 수정
-- [x] 모든 문서의 설계 철학 및 기술적 정합성 동기화 완료
