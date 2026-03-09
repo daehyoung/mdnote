@@ -21,6 +21,7 @@
 | **REQ-C-01/02** | 카테고리 관리 | `UC-A-03` | `CategoryManageView.vue` | 트리 아이템, CRUD 팝업 | `POST/PUT /api/v1/categories` | `CategoryController` | 시스템 공통 카테고리 트리 |
 | **REQ-CM-01** | 문서 댓글 대화 | `UC-D-03` | `DocumentDetailView.vue` | `#input-comment`, `#btn-post-comment` | `POST /api/v1/comments` | `CommentController` | `Allow Comments` 설정 연동 |
 | **REQ-A-01** | 시스템 모니터링 | `UC-A-05` | - | - | - | - | **미구현 (Future)** |
+| **REQ-A-02** | 자원 최적화 | `UC-A-06` | - | - | - | - | **미구현 (Orphaned File)** |
 
 ---
 

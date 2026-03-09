@@ -60,6 +60,12 @@ public class DocumentService {
         processTags(document);
         document.setCreatedAt(LocalDateTime.now());
         document.setUpdatedAt(LocalDateTime.now());
+        
+        // Link attachments if present
+        if (document.getAttachments() != null) {
+            document.getAttachments().forEach(a -> a.setDocument(document));
+        }
+        
         return documentRepository.save(document);
     }
     
@@ -99,8 +105,9 @@ public class DocumentService {
                 List<kr.luxsoft.mdnote.model.Attachment> atts = documentDetails.getAttachments();
                 atts.forEach(a -> a.setDocument(document));
                 
+                // When using @OneToMany with orphanRemoval, we should modify the existing collection
                 if (document.getAttachments() == null) {
-                    document.setAttachments(atts);
+                    document.setAttachments(new java.util.ArrayList<>(atts));
                 } else {
                     document.getAttachments().clear();
                     document.getAttachments().addAll(atts);

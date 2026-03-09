@@ -12,8 +12,7 @@
 정립된 설계 지침을 바탕으로 신규 유스케이스 도출 또는 기존 시나리오의 기술적 검증 고도화
 
 [Task List]
-- [x] `docs/usecases.md` 내 모든 중단점에 구체적인 '필수 정보(Payload)' 명시
-- [x] `docs/usecases.md` 사용자 관리 분리 (UC-A-01A 조회, UC-A-01B 등록) <!-- id: 17 -->
-- [x] `docs/usecase-guide.md` 및 `.usecase_strategy.md`에 API/UI 설계 연계 지침 추가
-- [x] 로그인, 문서 생성, 관리자 기능 등 모든 트랜잭션 포인트의 데이터 필딩 정의 완료
-- [x] 선행/후행 조건 및 트랜잭션 컨텍스트 가이드 보강 완료
+- [x] `docs/usecases.md` 사용자 관리 분리 및 고립된 파일 관리(UC-A-06) 추가
+- [x] `docs/01_requirements.md` & `07_traceability_matrix.md` 최신 요구사항 반영
+- [x] `DocumentService.java` 첨부파일 연결 로직 결함 수정
+- [x] 모든 문서의 설계 철학 및 기술적 정합성 동기화 완료
