@@ -23,24 +23,24 @@ sudo ufw default allow outgoing
 # 3. 필수 포트 허용
 echo -e "${GREEN}포트 분류별 개방 정책 적용 중...${NC}"
 
-# [Category A] 필수 서비스 포트 (Standard Web)
-# 외부 브라우저 접속을 위한 표준 포트
+# [Category A] 필수 서비스 포트 (Public Service)
+# 외부 브라우저 접속을 위한 표준 포트 (80: HTTP, 443: HTTPS)
 echo -e "${BLUE}1. 서비스 포트 허용: 80, 443${NC}"
 sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
 
-# [Category B] 애플리케이션 런타임 포트 (App Specific)
-# 도커 컨테이너와 직접 통신하거나 내부망 디버깅 시 필요
+# [Category B] 애플리케이션 런타임 포트 (Internal Application)
+# 로컬 개발 환경이나 내부망 테스트용. 프로덕션에서는 Nginx 프록시 사용 권장.
 echo -e "${BLUE}2. 애플리케이션 포트 허용: 3000(FE), 8080(BE)${NC}"
 sudo ufw allow 3000/tcp
 sudo ufw allow 8080/tcp
 
-# [Category C] 관리 및 디버깅 포트 (Management/Debug)
-# SSH는 접속 유지를 위해 항상 허용
+# [Category C] 관리 및 데이터 포트 (Management/Data)
+# SSH는 접속 유지를 위해 항상 허용 (관리자 IP 제한 권장)
 echo -e "${BLUE}3. 관리 포트 허용: 22(SSH)${NC}"
 sudo ufw allow ssh
 
-# PostgreSQL (데이터베이스 직접 접근 필요 시에만 주석 해제하여 사용 권장)
+# PostgreSQL (데이터베이스 직접 접근 필요 시에만 주석 해제 - 프로덕션 외부 공개 금지)
 # sudo ufw allow 5432/tcp
 
 # [보안 팁] 최종 서비스 시에는 Nginx 등을 통해 80/443만 외부로 노출하고

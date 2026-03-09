@@ -136,9 +136,9 @@
 ### 2) 우분투 방화벽 설정 (Firewall Setup)
 우분투 서버에서 서비스를 운영할 경우 필요한 포트를 개방해야 합니다. 보안을 위해 **서비스용 포트**와 **개발/관리용 포트**를 구분하여 관리하는 것을 권장합니다.
 
-*   **서비스용 포트 (Public)**: 80 (HTTP), 443 (HTTPS)
-*   **애플리케이션 포트 (Application)**: 3000 (Frontend), 8080 (Backend)
-*   **관리/디버깅 포트 (Management)**: 22 (SSH), 5432 (PostgreSQL - 필요 시에만 개방)
+*   **서비스용 포트 (Public Service)**: `80 (HTTP)`, `443 (HTTPS)` - 외부 공개용
+*   **애플리케이션 포트 (Internal Application)**: `3000 (Frontend)`, `8080 (Backend)` - 내부 통신용 (Nginx 프록시 권장)
+*   **관리/데이터 포트 (Management/Data)**: `22 (SSH)`, `5432 (PostgreSQL)` - **주의: 절대 외부 공개 금지 (VPN 또는 특정 IP만 허용 권장)**
 
 **[setup_firewall.sh](./setup_firewall.sh)** 스크립트를 통해 자동으로 설정을 진행할 수 있습니다.
 ```bash

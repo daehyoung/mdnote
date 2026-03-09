@@ -186,10 +186,10 @@ chmod +x setup_firewall.sh
 sudo ./setup_firewall.sh
 ```
 
-**[권장 포트 개방 정책]**
-1.  **서비스 포트 (Public)**: 80 (HTTP), 443 (HTTPS) - 외부 유입 필수
-2.  **애플리케이션 포트 (Application)**: 3000 (Frontend), 8080 (Backend) - 내부망/디버깅용
-3.  **관리 포트 (Management/Debug)**: 22 (SSH), 5432 (PostgreSQL - 필요 시만 개방)
+**[권장 포트 개방 정책 (Classification)]**
+1.  **서비스용 포트 (Public Service)**: `80 (HTTP)`, `443 (HTTPS)` - **외부 유입 허용 필수**. 사용자 브라우저 접속용.
+2.  **애플리케이션 포트 (Internal Application)**: `3000 (Frontend)`, `8080 (Backend)` - **주의: 내부망/디버깅용**. 프로덕션에서는 Nginx 프록시를 통하고 직접 개방은 비권장.
+3.  **관리 및 데이터 포트 (Management/Data)**: `22 (SSH)`, `5432 (PostgreSQL)` - **주의: 절대 외부 공개 금지**. VPN 또는 지정된 특정 관리자 IP만 허용 권장.
 
 > [!IMPORTANT]
 > 최종 프로덕션 환경에서는 Nginx 리버스 프록시를 통해 **80/443 포트만 외부로 노출**하고, 3000(FE) 및 8080(BE) 포트는 로컬(127.0.0.1)에서만 접근 가능하도록 방화벽 혹은 도커 네트워크 설정을 강화하는 것이 안전합니다.

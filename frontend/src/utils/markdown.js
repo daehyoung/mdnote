@@ -32,12 +32,19 @@ marked.use({ renderer });
 
 /**
  * Custom marked function that includes DOMPurify sanitization
+ * Configured to allow Mermaid and KaTeX (MathML) tags/attributes.
  */
 const sanitizedMarked = (content) => {
-    const rawHtml = marked.parse(content);
+    const rawHtml = marked.parse(content || '');
     return DOMPurify.sanitize(rawHtml, {
-        ADD_TAGS: ['div'], // Ensure div for mermaid is allowed
-        ADD_ATTR: ['class'] 
+        // Allow MathML for KaTeX and standard HTML profiles
+        USE_PROFILES: { html: true, mathMl: true },
+        // Explicitly allow div and class for Mermaid containers
+        ADD_TAGS: ['div', 'span'], 
+        ADD_ATTR: ['class', 'style', 'aria-hidden'],
+        // Ensure data attributes are allowed if needed by any plugins
+        FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed'],
+        FORBID_ATTR: ['onerror', 'onload', 'onclick']
     });
 };
 
