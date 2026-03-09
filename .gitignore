@@ -9,4 +9,6 @@ docs/.usecase_strategy.md
 docs/.workflow.md
 docs/.coding_rules.md
 docs/.architecture-guide.md
+docs/.architecture-backend.md
+docs/.architecture-frontend.md
 .env
