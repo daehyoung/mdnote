@@ -12,8 +12,8 @@
 정립된 설계 지침을 바탕으로 신규 유스케이스 도출 또는 기존 시나리오의 기술적 검증 고도화
 
 [Task List]
-- [x] `docs/usecase-guide.md` 핵심 요소 및 체크리스트 정비
-- [x] `docs/.usecase_strategy.md` 용어(선행/후행 조건) 및 바운더리 지침 정합성 확보
-- [x] `docs/usecases.md` 내 용어 일괄 업데이트 (사전/사후 -> 선행/후행)
-- [x] 보안 강화 및 방화벽 설정 최적화 완료 (이전 세션)
-- [x] 모든 문서의 설계 철학 동기화 완료
+- [x] `docs/usecases.md` 내 모든 중단점에 구체적인 '필수 정보(Payload)' 명시
+- [x] `docs/usecases.md` 사용자 관리 분리 (UC-A-01A 조회, UC-A-01B 등록) <!-- id: 17 -->
+- [x] `docs/usecase-guide.md` 및 `.usecase_strategy.md`에 API/UI 설계 연계 지침 추가
+- [x] 로그인, 문서 생성, 관리자 기능 등 모든 트랜잭션 포인트의 데이터 필딩 정의 완료
+- [x] 선행/후행 조건 및 트랜잭션 컨텍스트 가이드 보강 완료
