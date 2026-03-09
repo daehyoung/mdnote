@@ -13,13 +13,11 @@
 
 ---
 ## AI 작업 가이드 문서(프롬프트)
+* **[LLM 컨텍스트 메커니즘과 에이전트 성능 최적화 전략](./docs/ai-context.md)**
 * **소프트웨어 개발 단계별 역할 및 작업 지시서**
 * **[유스케이스 설계 가이드](./docs/usecase-guide.md)**
-* **[아키텍처 설계 가이드](./docs/architecture-guide.md)**
 * **코드작성 지침**
 * **테스트 전략 지침**
-
-참고 문서 : **[LLM 컨텍스트 메커니즘과 에이전트 성능 최적화 전략](./docs/ai-context.md)**
 
 
 ## 🛠 개발 정보 (Development Info)
@@ -36,7 +34,7 @@
 
 1. **[요구사항 정의서 (`01_requirements.md`)](./docs/01_requirements.md)**: 사용자 권한(Role) 정의 및 시스템 전반의 핵심 기능 요구사항 명세.
 2. **[기능 분석표 (`02_feature_analysis.md`)](./docs/02_feature_analysis.md)**: 백엔드 모듈 구조 및 컨트롤러-기능 맵핑 분석.
-3. **[시스템 아키텍처 설계 (`03_architecture.md`)](./docs/03_architecture.md)**: 기술 스택, 인증(Security) 전략, 데이터베이스 설계 사상 도식화. (**[가이드](./docs/architecture-guide.md)**)
+3. **[시스템 아키텍처 설계 (`03_architecture.md`)](./docs/03_architecture.md)**: 기술 스택, 인증(Security) 전략, 데이터베이스 설계 사상 도식화.
 4. **[데이터베이스 설계서 (`03_db_design.md`)](./docs/03_db_design.md)**: 데이터베이스 스키마(ERD), 테이블 정의 및 SQL 스크립트.
 5. **[유스케이스 명세서 (`usecases.md`)](./docs/usecases.md)**: 액터별 가치 중심 시나리오와 시스템 상호작용 및 중단점 정의.
 6. **[프론트엔드 화면 설계서 (`04_frontend_ui_design.md`)](./docs/04_frontend_ui_design.md)**: 각 화면(뷰)의 와이어프레임(객체 트리) 구조 및 버튼 요소-API 엔드포인트 연동 규격 상세 리스트.
@@ -94,9 +92,9 @@
         - [x] 소속 기관별(GROUP) 읽기/쓰기
     - [x] 문서 상태(라이프사이클) 관리 - DRAFT, REVIEW, PUBLISHED 등 속성 지원 (`REQ-D-02`)
 
-- [x] 뷰 모드 (VIEW / EDIT) (`REQ-D-06`)
-    - [x] VIEW 모드: 카테고리별 문서 목록 표시 (PUBLISHED 문서 위주 권한 필터링) (`UC-D-01A`)
-    - [x] EDIT 모드: 내 부서 및 전체 문서에서 소유/쓰기 권한 있는 문서 표시 (`UC-D-01B`)
+- [x] 뷰 모드 (VIEW / EDIT) (`REQ-D-02`)
+    - [x] VIEW 모드: 카테고리별 문서 목록 표시 (PUBLISHED 문서 위주 권한 필터링)
+    - [x] EDIT 모드: 내 부서 및 전체 문서에서 소유/쓰기 권한 있는 문서 표시
     - [x] 문서 액션: 작성, 수정, 삭제 (`REQ-D-01`)
     - [ ] 문서 액션: 복사, 이동 (향후 고도화 필요)
     - [x] 문서 검색 (`REQ-D-02`)

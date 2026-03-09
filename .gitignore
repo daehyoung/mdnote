@@ -8,4 +8,5 @@ docs/.test_strategy.md
 docs/.usecase_strategy.md
 docs/.workflow.md
 docs/.coding_rules.md
+docs/.architecture-guide.md
 .env
