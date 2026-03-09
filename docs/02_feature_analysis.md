@@ -13,8 +13,9 @@
 | **REQ-U-03** | | | 사용자 생성/삭제 | `/api/admin/users` | 관리자가 새 사용자를 등록하거나 강제 삭제. |
 | **REQ-U-03** | | | 상태 및 부서 변경 | `/api/admin/users/{id}/status` | 관리자가 사용자의 상태(ACTIVE/INACTIVE)와 부서(Department)를 할당. |
 | **REQ-U-03** | | | 비밀번호 강제 초기화 | `/api/admin/users/{id}/password` | 관리자가 특정 사용자의 비밀번호를 초기화. |
-| **REQ-D-02** | **Document** | 문서 기본 | 문서 목록/검색 (`/docs`) | `/api/documents` | 카테고리, 태그명, 쿼리, 상태 기반 다중 필터링 및 페이징 적용 문서 목록 반환. 사용자 권한에 따른 필터링(공개/비공개) 포함. |
-| **REQ-D-02** | | | 문서 단건 조회 (`/{id}`) | `/api/documents/{id}` | 요청한 특정 문서의 상세 내용 응답. |
+| **REQ-D-02** | **Document** | 문서 기본 | 문서 목록 조회 (VIEW) | `/api/documents` | 발행 완료(PUBLISHED) 문서를 중심으로 한 지식 소비용 목록 제공. |
+| **REQ-D-06** | | | 작업 대상 조회 (EDIT) | `/api/documents` | 작성자/그룹 권한 기반의 지식 관리/생산용 목록(초안 포함) 제공. |
+| **REQ-D-02** | | | 문서 상세 조회 (`/{id}`) | `/api/documents/{id}` | 요청한 특정 문서의 상세 내용 응답. |
 | **REQ-D-01** | | | 문서 작성/수정/삭제 | `/api/documents` | 로그인 사용자의 문서 Markdown 내용과 상태(Draft, Published)를 DB에 반영. |
 | **REQ-D-03** | | 권한 제어 | 권한 검증 기능 (Service) | N/A | DB의 `publicRead`, `groupRead` 플래그 및 작성자 비교 로직을 통해 인가된 사용자만 열람 및 수정이 가능하도록 통제. |
 | **REQ-C-01** | **Metadata** | 분류 | 카테고리 계층형 관리 | `/api/categories` | 트리(Parent-Child) 구조를 띈 카테고리를 생성, 조회, 수정하는 엔드포인트 제공. |

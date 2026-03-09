@@ -14,8 +14,9 @@
 | **REQ-U-04** | 조직/부서 관리 | `UC-A-04` | `OrganizationView.vue` | 트리 아이템 | `POST/PUT /api/v1/departments` | `DepartmentController` | 시스템 조직 계층도 관리 |
 | **REQ-D-01** | 문서 생성/저장 | `UC-D-02` | `DocumentEditView.vue` | `#btn-save`, Markdown 에디터 | `POST /api/v1/documents` <br> `PUT /api/v1/documents/{id}` | `DocumentController` <br> (`create`/`update`) | Status(DRAFT 등) 동시 제어 |
 | **REQ-D-01** | 문서 삭제 | `UC-D-02` | `DocumentEditView.vue` | `#btn-del-doc` | `DELETE /api/v1/documents/{id}` | `DocumentController.delete()` | 본인 작성 문서 혹은 Admin |
-| **REQ-D-02** | 문서 목록 뷰어 | `UC-D-01` | `HomeView.vue` | `#list-item-doc`, `#pagination` | `GET /api/v1/documents` | `DocumentController.getAll...` | PUBLISHED 문서 조회 중심 |
-| **REQ-D-02** | 목록 검색/태그 필터 | `UC-D-04` | `HomeView.vue` | `#input-search`, `#sel-status` | `GET /api/v1/documents?search=...` | `DocumentController` | Query Parameter 전송 |
+| **REQ-D-02** | 문서 목록 뷰어 | `UC-D-01A` | `HomeView.vue` (VIEW) | `#list-item-doc`, `#pagination` | `GET /api/documents?status=PUBLISHED` | `DocumentController` | 지식 소비용 목록 (공개 중심) |
+| **REQ-D-06** | 뷰 모드 분리 (EDIT) | `UC-D-01B` | `HomeView.vue` (EDIT) | `#list-item-doc`, `#btn-edit` | `GET /api/documents?status=DRAFT...` | `DocumentController` | 지식 관리용 목록 (작성자 중심) |
+| **REQ-D-02** | 목록 검색/태그 필터 | `UC-D-04` | `HomeView.vue` | `#input-search`, `#sel-status` | `GET /api/documents?search=...` | `DocumentController` | Query Parameter 전송 |
 | **REQ-D-03** | 문서 접근 권한 제어 | `UC-D-03` | `DocumentDetailView.vue` | 퍼미션 아이콘(Badge) | `GET /api/v1/documents/{id}` | `DocumentService` (권한 로직) | 백엔드 권한 필터 검증 |
 | **REQ-D-04** | 첨부 파일 스토리지 | `UC-D-02` | `DocumentEditView.vue` <br> (Settings Drawer) | `#btn-attach` | `POST /api/v1/attachments/upload` | `AttachmentController` | 멀티파트 파일 업로드 |
 | **REQ-C-01/02** | 카테고리 관리 | `UC-A-03` | `CategoryManageView.vue` | 트리 아이템, CRUD 팝업 | `POST/PUT /api/v1/categories` | `CategoryController` | 시스템 공통 카테고리 트리 |
