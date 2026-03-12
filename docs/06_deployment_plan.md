@@ -63,13 +63,11 @@ CMD ["nginx", "-g", "daemon off;"]
 * 소스코드 변경에 유연하게 대응하기 위한 Gradle/Maven 멀티 스테이지 빌드.
 ```dockerfile
 # Stage 1: Build JAR
-FROM eclipse-temurin:17-jdk-alpine AS builder
+FROM maven:3.9-eclipse-temurin-17 AS builder
 WORKDIR /workspace
-COPY gradlew .
-COPY gradle gradle
-COPY build.gradle settings.gradle ./
+COPY pom.xml .
 COPY src src
-RUN ./gradlew bootJar --no-daemon
+RUN mvn clean package -DskipTests
 
 # Stage 2: Runtime
 FROM eclipse-temurin:17-jre-alpine
@@ -162,7 +160,7 @@ volumes:
 운영 환경(Production)의 무중단 배포 및 자동화 흐름은 다음과 같이 추천합니다. (예: GitHub Actions 기준)
 
 1. **[CI] Branch Push (PR)**: 
-   - 프론트엔드/백엔드 폴더 내에서 `npm run test:unit`, `gradlew test` 트리거. 통과 실패 시 병합 차단.
+   - 프론트엔드/백엔드 폴더 내에서 `npm run test:unit`, `mvn test` 트리거. 통과 실패 시 병합 차단.
 2. **[CI] Build Container Image**: 
    - `main` 브랜치 병합 시 GitHub Actions Runner가 `docker build`를 실행.
 3. **[CD] Push to Registry**: 
@@ -188,7 +186,7 @@ sudo ./setup_firewall.sh
 
 **[권장 포트 개방 정책 (Classification)]**
 1.  **서비스용 포트 (Public Service)**: `80 (HTTP)`, `443 (HTTPS)` - **외부 유입 허용 필수**. 사용자 브라우저 접속용.
-2.  **애플리케이션 포트 (Internal Application)**: `3000 (Frontend)`, `8080 (Backend)` - **주의: 내부망/디버깅용**. 프로덕션에서는 Nginx 프록시를 통하고 직접 개방은 비권장.
+2.  **애플리케이션 포트 (Internal Application)**: `3000 (Frontend)`, `8080 (Backend)` - **주의: 내부망/디버깅용**. 프로덕션에서는 Nginx 프록시를 통해 80포트로 서빙되며 직접 개방은 비권장.
 3.  **관리 및 데이터 포트 (Management/Data)**: `22 (SSH)`, `5432 (PostgreSQL)` - **주의: 절대 외부 공개 금지**. VPN 또는 지정된 특정 관리자 IP만 허용 권장.
 
 > [!IMPORTANT]

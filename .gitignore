@@ -3,12 +3,7 @@
 *.log
 .aider*
 backups
-docs/.role_spec.md
-docs/.test_strategy.md
-docs/.usecase_strategy.md
-docs/.workflow.md
-docs/.coding_rules.md
-docs/.architecture-guide.md
-docs/.architecture-backend.md
-docs/.architecture-frontend.md
+docs/prompts/*
+do
 .env
+.env.*

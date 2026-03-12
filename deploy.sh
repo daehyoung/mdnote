@@ -8,11 +8,21 @@ NC='\033[0m'
 
 echo -e "${BLUE}[Docker Build & Deploy Script]${NC}"
 
-# 1. 프론트엔드 빌드 (Dockerfile이 dist 폴더를 필요로 함)
+# 0. 환경 변수 확인
+if [ ! -f .env ]; then
+    echo -e "${YELLOW}Warning: .env 파일이 없습니다. .env.example을 참고하여 생성하세요.${NC}"
+    if [ -f .env.example ]; then
+        cp .env.example .env
+        echo -e "${GREEN}.env.example 파일을 .env로 복사했습니다. 내용을 수정하시기 바랍니다.${NC}"
+    fi
+fi
+
+# 1. 프론트엔드 빌드 (Docker 내부에서 수행하도록 변경되었지만, 로컬 테스트를 위해 유지하거나 선택 가능)
 echo -e "${GREEN}Step 1: Building Frontend...${NC}"
-cd frontend
-npm install --legacy-peer-deps && npm run build
-cd ..
+# cd frontend
+# npm install --legacy-peer-deps && npm run build
+# cd ..
+# Docker 멀티스테이지 빌드를 사용하므로 위 단계는 생략 가능합니다.
 
 # 2. 기존 컨테이너 중지 및 삭제
 echo -e "${GREEN}Step 2: Stopping existing containers...${NC}"
